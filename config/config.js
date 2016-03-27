@@ -22,7 +22,7 @@ var config = {
 			uri: 'mongodb://localhost:27017/web'
 		},
 		auth: {
-			endpoint: 'localhost:3000',
+			endpoint: 'http://localhost:3000',
 			platform: 'web',
 			token: 'localhost_web_token'
 		}

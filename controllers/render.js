@@ -9,9 +9,36 @@
 /*jslint nomen:true*/
 "use strict";
 
+// Requires
+var logger = require('../config/logger');
+
 module.exports.home = function (req, res, next) {
+	logger.debug('User: ' + JSON.stringify(req.user));
 	return res.render('index', {
 		title: 'Home',
 		user: req.user
 	});
-}
+};
+
+module.exports.login = function (req, res, next) {
+	return res.render('login', {
+		title: 'Login',
+		user: req.user
+	});
+};
+
+
+// Test
+module.exports.userTest = function (req, res, next) {
+	var options = {
+		url: require('../config/config').auth.endpoint + '/auth/test_auth',
+		headers: {
+			cookie: 'connect.sid=' + req.user.connection
+		}
+	};
+	require('request')(options, function (err, resp, body) {
+		logger.debug(JSON.stringify(resp));
+		logger.debug(body);
+		res.send('OK');
+	});
+};
