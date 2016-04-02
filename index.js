@@ -13,7 +13,7 @@
 require('./config/logger').initialize();
 
 // Connect to MongoDB and setup mongoose
-require('./config/mongoose')();
+// require('./config/mongoose')();
 
 // Create app
 var app = require('./config/express')();

@@ -31,7 +31,7 @@ module.exports.login = function (req, res, next) {
 // Test
 module.exports.userTest = function (req, res, next) {
 	var options = {
-		url: require('../config/config').auth.endpoint + '/auth/test_auth',
+		url: require('../config/config').auth.endpoint + '/users/me',
 		headers: {
 			cookie: 'connect.sid=' + req.user.connection
 		}
@@ -39,6 +39,6 @@ module.exports.userTest = function (req, res, next) {
 	require('request')(options, function (err, resp, body) {
 		logger.debug(JSON.stringify(resp));
 		logger.debug(body);
-		res.send('OK');
+		res.send(body);
 	});
 };

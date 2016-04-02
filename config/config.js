@@ -18,8 +18,11 @@ var config = {
 		port: 4000,
 		sessionSecret: 'localSessionSecret',
 		morgan: 'REQ :remote-addr - :remote-user  ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent" - :response-time',
-		mongo: {
-			uri: 'mongodb://localhost:27017/web'
+		// mongo: {
+		// 	uri: 'mongodb://localhost:27017/web'
+		// },
+		redis: {
+			uri: 'redis://127.0.0.1:6379/'
 		},
 		auth: {
 			endpoint: 'http://localhost:3000',
@@ -34,8 +37,11 @@ var config = {
 		port: process.env.PORT,
 		sessionSecret: process.env.SESSION_SECRET,
 		morgan: 'REQ :remote-addr - :remote-user  ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent" - :response-time',
-		mongo: {
-			uri: process.env.MONGOLAB_URI
+		// mongo: {
+		// 	uri: process.env.MONGOLAB_URI
+		// },
+		redis: {
+			uri: process.env.REDIS_URL
 		},
 		auth: {
 			endpoint: 'https://auth-wolf.herokuapp.com',

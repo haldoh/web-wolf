@@ -17,7 +17,7 @@ block navbar
 							a(href='/login') Login
 					if (user)
 						li.dropdown
-							a.dropdown-toggle(href='#' data-toggle='dropdown' role='button' aria-expanded='false') #{user.id}
+							a.dropdown-toggle(href='#' data-toggle='dropdown' role='button' aria-expanded='false') #{user.displayName}
 								ul.dropdown-menu(role='menu')
 									li
 										a(href='/logout') Logout

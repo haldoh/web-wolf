@@ -14,6 +14,7 @@ var router = express.Router();
 var passport = require('passport');
 
 var render = require('../controllers/render');
+var auth = require('../controllers/auth');
 
 router.route('/')
 	// GET - render home page
@@ -31,5 +32,8 @@ router.route('/login')
 		successRedirect: '/',
 		failureRedirect: '/fail'
 	}));
+
+router.route('/logout')
+	.get(auth.isAuthenticated, auth.logout);
 
 module.exports = router;

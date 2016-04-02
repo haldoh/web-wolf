@@ -84,6 +84,7 @@ module.exports = function () {
 					return done(null, {
 						id: bodyObj._id,
 						email: bodyObj.email,
+						displayName: bodyObj.displayName,
 						facebook: bodyObj.facebook,
 						google: bodyObj.google,
 						twitter: bodyObj.twitter,
