@@ -18,7 +18,7 @@ module.exports.home = function (req, res, next) {
 		title: 'Home',
 		user: req.user,
 		auth: require('../config/config').auth.endpoint,
-		endpoint: require('../config/config').endpoint 
+		endpoint: require('../config/config').endpoint
 	});
 };
 
@@ -30,8 +30,8 @@ module.exports.login = function (req, res, next) {
 };
 
 
-// Test
-module.exports.userTest = function (req, res, next) {
+// Remote user info test
+module.exports.authTest = function (req, res, next) {
 	var options = {
 		url: require('../config/config').auth.endpoint + '/users/me',
 		headers: {
@@ -43,4 +43,11 @@ module.exports.userTest = function (req, res, next) {
 		logger.debug(body);
 		res.send(body);
 	});
+};
+
+// Local user info test
+module.exports.localTest = function (req, res, next) {
+
+	logger.debug(req.user);
+	res.send(req.user);
 };

@@ -20,9 +20,13 @@ router.route('/')
 	// GET - render home page
 	.get(render.home);
 
-router.route('/test')
-	// GET - render home page
-	.get(render.userTest);
+router.route('/local_test')
+	// GET - render local user info
+	.get(render.localTest);
+
+router.route('/auth_test')
+	// GET - render remote user info
+	.get(render.authTest);
 
 router.route('/login')
 	// GET - render login page
