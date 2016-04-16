@@ -107,4 +107,64 @@ module.exports = function () {
 		function (req, email, password, done) {
 			// TODO
 		}));
+
+	/* Session setup with token
+	 */
+	passport.use('session-setup', new LocalStrategy({
+
+			passReqToCallback: true // Pass back the entire request to the callback
+		},
+		function (req, username, password, done) {
+			
+			// Set up request to auth layer
+			var url = require('../config/config').auth.endpoint + '/users/me';
+			var cookieJar = request.jar();
+			var options = {
+				url: url,
+				followAllRedirects: true,
+				jar: cookieJar,
+				headers: {
+					cookie: 'connect.sid=' + req.wolfAuthCookie
+				}
+			};
+			request(options, function (err, resp, body) {
+
+				// Error
+				if (err) {
+					logger.warn('Error calling auth user data: ' + err);
+					return done(err);
+				}
+
+				// Bad response from auth layer
+				else if (resp.statusCode < 200 || resp.statusCode > 399) {
+					logger.warn('Bad response from auth layer: ' + JSON.stringify(resp));
+				}
+
+				// OK - process user data
+				else {
+
+					// Parse response body
+					var bodyObj;
+					try {
+						bodyObj = JSON.parse(body);
+					} catch (e) {
+						// Log errors and return
+						logger.warn('Error parsing user data response body - error: ' + e);
+						logger.warn('Error parsing user data response body - body: ' + body);
+						return done(e);
+					}
+
+					// Return user data
+					return done(null, {
+						id: bodyObj._id,
+						email: bodyObj.email,
+						displayName: bodyObj.displayName,
+						facebook: bodyObj.facebook,
+						google: bodyObj.google,
+						twitter: bodyObj.twitter,
+						connection: req.wolfAuthCookie
+					});
+				}
+			});
+		}));
 };

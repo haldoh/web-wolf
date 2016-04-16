@@ -22,7 +22,7 @@ var config = {
 		// 	uri: 'mongodb://localhost:27017/web'
 		// },
 		redis: {
-			uri: 'redis://127.0.0.1:6379/'
+			uri: 'redis://127.0.0.1:6379/3'
 		},
 		auth: {
 			endpoint: 'http://localhost:3000',

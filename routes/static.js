@@ -33,6 +33,9 @@ router.route('/login')
 		failureRedirect: '/fail'
 	}));
 
+router.route('/session_setup')
+	.get(auth.sessionSetup, auth.loggedRedirect);
+
 router.route('/logout')
 	.get(auth.isAuthenticated, auth.logout);
 
