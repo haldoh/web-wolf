@@ -64,6 +64,7 @@ module.exports = function () {
 				// Bad response from auth layer
 				else if (resp.statusCode < 200 || resp.statusCode > 399) {
 					logger.warn('Bad response from auth layer: ' + JSON.stringify(resp));
+					return done(new Error('Bad response from auth layer: ' + JSON.stringify(resp)));
 				}
 
 				// Login OK - process user data
@@ -138,6 +139,7 @@ module.exports = function () {
 				// Bad response from auth layer
 				else if (resp.statusCode < 200 || resp.statusCode > 399) {
 					logger.warn('Bad response from auth layer: ' + JSON.stringify(resp));
+					return done(new Error('Bad response from auth layer: ' + JSON.stringify(resp)));
 				}
 
 				// OK - process user data
