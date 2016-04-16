@@ -9,12 +9,18 @@
 /*jslint nomen:true*/
 "use strict";
 
+var endpoint = {
+	local: 'http://192.168.0.8:4000',
+	heroku: 'https://web-wolf.herokuapp.com'
+};
+
 // Configuration object
 var config = {
 
 	// Local configuration parameters
 	local: {
 		mode: 'local',
+		endpoint: endpoint.local,
 		port: 4000,
 		sessionSecret: 'localSessionSecret',
 		morgan: 'REQ :remote-addr - :remote-user  ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent" - :response-time',
@@ -25,7 +31,7 @@ var config = {
 			uri: 'redis://127.0.0.1:6379/3'
 		},
 		auth: {
-			endpoint: 'http://localhost:3000',
+			endpoint: 'http://192.168.0.8:3000',
 			platform: 'web',
 			token: 'localhost_web_token'
 		}
@@ -34,6 +40,7 @@ var config = {
 	// Heroku configuration parameters
 	heroku: {
 		mode: 'heroku',
+		endpoint: endpoint.heroku,
 		port: process.env.PORT,
 		sessionSecret: process.env.SESSION_SECRET,
 		morgan: 'REQ :remote-addr - :remote-user  ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent" - :response-time',

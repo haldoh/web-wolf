@@ -16,7 +16,9 @@ module.exports.home = function (req, res, next) {
 	logger.debug('User: ' + JSON.stringify(req.user));
 	return res.render('index', {
 		title: 'Home',
-		user: req.user
+		user: req.user,
+		auth: require('../config/config').auth.endpoint,
+		endpoint: require('../config/config').endpoint 
 	});
 };
 

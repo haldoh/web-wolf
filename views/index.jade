@@ -5,3 +5,13 @@ block content
 		.starter-template
 			h1 web-wolf
 			p.lead Web server for Wolf's applications.
+			if (!user)
+				p
+					a(href='/login') Login
+				p or
+				p
+					a(href=auth + '/auth/facebook?refUrl=' + endpoint + '/session_setup')
+						button.btn.btn-default.add-btn(type="button") Login with Facebook
+				p
+					a(href=auth + '/auth/twitter?refUrl=' + endpoint + '/session_setup')
+						button.btn.btn-default.add-btn(type="button") Login with Twitter
