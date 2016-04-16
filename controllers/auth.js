@@ -46,7 +46,9 @@ module.exports.sessionSetup = function (req, res, next) {
 	req.body.password = 'pwd';
 
 	// Call passport strategy
-	return passport.authenticate('session-setup', {})(req, res, next);
+	return passport.authenticate('session-setup', {
+		failureRedirect: '/fail'
+	})(req, res, next);
 };
 
 /* Redirection after external auth
