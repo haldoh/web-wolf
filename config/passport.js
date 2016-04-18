@@ -118,27 +118,29 @@ module.exports = function () {
 		function (req, username, password, done) {
 			
 			// Set up request to auth layer
-			var url = require('../config/config').auth.endpoint + '/users/me';
+			var url = require('../config/config').auth.endpoint + '/auth/session_setup';
 			var cookieJar = request.jar();
-			var cookie = request.cookie('connect.sid=' + req.wolfAuthCookie + '; path=/; domain=auth-wolf.herokuapp.com');
-			cookieJar.setCookie(cookie, 'https://auth-wolf.herokuapp.com/');
 			var options = {
 				url: url,
+				method: 'POST',
 				followAllRedirects: true,
-				jar: cookieJar
+				jar: cookieJar,
+				form: {
+					token: req.wolfToken
+				}
 			};
 			request(options, function (err, resp, body) {
 
 				// Error
 				if (err) {
-					logger.warn('Error calling auth user data: ' + err);
+					logger.warn('Error calling session setup call: ' + err);
 					return done(err);
 				}
 
 				// Bad response from auth layer
 				else if (resp.statusCode < 200 || resp.statusCode > 399) {
-					logger.warn('Bad response from auth layer: ' + JSON.stringify(resp));
-					return done(new Error('Bad response from auth layer: ' + JSON.stringify(resp)));
+					logger.warn('Bad response from session setup call: ' + JSON.stringify(resp));
+					return done(new Error('Bad response from session setup call: ' + JSON.stringify(resp)));
 				}
 
 				// OK - process user data
@@ -163,7 +165,7 @@ module.exports = function () {
 						facebook: bodyObj.facebook,
 						google: bodyObj.google,
 						twitter: bodyObj.twitter,
-						connection: req.wolfAuthCookie
+						connection: cookieJar.getCookies(url)[0].value
 					});
 				}
 			});

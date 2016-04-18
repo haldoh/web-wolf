@@ -28,20 +28,14 @@ module.exports.isAuthenticated = function (req, res, next) {
  */
 module.exports.sessionSetup = function (req, res, next) {
 
-	console.log(req.headers);
-
 	// Try to get ref URL from request
 	var refUrl = req.query.hasOwnProperty('refUrl') ? encodeURIComponent(req.query.refUrl) : null;
 
+	// Get token parameter
+	req.wolfToken = req.query.hasOwnProperty('token') ? req.query.token : -1;
+
 	// If a ref URL was given, redirect to it, otherwise redirect to home
 	req.successRedirect = refUrl ? decodeURIComponent(refUrl) : '/';
-
-	// Get cookie value
-	var cookieValue = req.headers && req.headers.cookie ? req.headers.cookie : null;
-	cookieValue = cookieValue && 1 in cookieValue.split('=') ? cookieValue.split('=')[1] : null;
-
-	// Store value in request
-	req.wolfAuthCookie = cookieValue;
 
 	// Trick passport into thinking that we have user and password
 	req.body.username = 'user';
