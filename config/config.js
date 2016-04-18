@@ -31,8 +31,8 @@ var config = {
 			uri: 'redis://127.0.0.1:6379/3'
 		},
 		auth: {
-			endpoint: 'http://192.168.0.8:3000',
-			platform: 'web',
+			endpoint: 'http://localhost:3000',
+			platform: 'web-wolf',
 			token: 'localhost_web_token'
 		}
 	},
@@ -52,7 +52,7 @@ var config = {
 		},
 		auth: {
 			endpoint: 'https://auth-wolf.herokuapp.com',
-			platform: 'web',
+			platform: process.env.AUTH_PLATFORM,
 			token: process.env.AUTH_TOKEN
 		}
 	}

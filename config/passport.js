@@ -14,6 +14,8 @@ var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
 var request = require('request');
 
+var auth = require('../models/auth');
+
 var logger = require('./logger');
 var config = require('./config');
 
@@ -41,19 +43,21 @@ module.exports = function () {
 			passReqToCallback: true // Pass back the entire request to the callback
 		},
 		function (req, email, password, done) {
+
+			// Full login URL
 			var url = config.auth.endpoint + '/auth/login';
+
+			// Custom cookie jar for call
 			var cookieJar = request.jar();
-			var options = {
-				url: url,
-				method: 'POST',
-				followAllRedirects: true,
-				jar: cookieJar,
-				form: {
-					email: email,
-					password: password
-				}
+
+			// Login data
+			var data = {
+				email: email,
+				password: password
 			};
-			request(options, function (err, resp, body) {
+
+			// Call auth layer local login
+			auth.localLogin(data, cookieJar, function (err, resp, body) {
 
 				// Login error
 				if (err) {
@@ -116,20 +120,19 @@ module.exports = function () {
 			passReqToCallback: true // Pass back the entire request to the callback
 		},
 		function (req, username, password, done) {
+
+			// Full request URL
+			var url = config.auth.endpoint + '/auth/session_setup';
 			
-			// Set up request to auth layer
-			var url = require('../config/config').auth.endpoint + '/auth/session_setup';
+			// Custom cookie jar for call
 			var cookieJar = request.jar();
-			var options = {
-				url: url,
-				method: 'POST',
-				followAllRedirects: true,
-				jar: cookieJar,
-				form: {
-					token: req.wolfToken
-				}
+
+			// Login data
+			var data = {
+				token: req.wolfToken
 			};
-			request(options, function (err, resp, body) {
+			
+			auth.sessionSetup(data, cookieJar, function (err, resp, body) {
 
 				// Error
 				if (err) {

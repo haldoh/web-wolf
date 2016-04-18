@@ -86,6 +86,8 @@ module.exports = function () {
 	app.use('/docs', express.static('docs'));
 	// Static/generic routes
 	app.use('/', require('../routes/static'));
+	// Auth routes
+	app.use('/auth', require('../routes/auth'));
 
 	/*
 	 * HTTP server setup

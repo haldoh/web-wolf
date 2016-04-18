@@ -12,6 +12,8 @@
 // Requires
 var passport = require('passport');
 
+var auth = require('../models/auth');
+
 var config = require('../config/config');
 var logger = require('../config/logger');
 
@@ -22,6 +24,39 @@ module.exports.isAuthenticated = function (req, res, next) {
 		return next();
 	else
 		return res.status(401).send('Unauthorized');
+};
+
+/* Facebook auth
+ */
+module.exports.facebookAuth = function (req, res, next) {
+
+	// Get URL to redirect to after signup
+	var returnUrl = req.query.hasOwnProperty('refUrl') ? req.query.refUrl : null;
+
+	// Redirect to auth layer
+	auth.facebookAuth(returnUrl, res);
+};
+
+/* Twitter auth
+ */
+module.exports.twitterAuth = function (req, res, next) {
+
+	// Get URL to redirect to after signup
+	var returnUrl = req.query.hasOwnProperty('refUrl') ? req.query.refUrl : null;
+
+	// Redirect to auth layer
+	auth.twitterAuth(returnUrl, res);
+};
+
+/* Google auth
+ */
+module.exports.googleAuth = function (req, res, next) {
+
+	// Get URL to redirect to after signup
+	var returnUrl = req.query.hasOwnProperty('refUrl') ? req.query.refUrl : null;
+
+	// Redirect to auth layer
+	auth.googleAuth(returnUrl, res);
 };
 
 /* Session setup

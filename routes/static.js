@@ -14,7 +14,6 @@ var router = express.Router();
 var passport = require('passport');
 
 var render = require('../controllers/render');
-var auth = require('../controllers/auth');
 
 router.route('/')
 	// GET - render home page
@@ -30,17 +29,6 @@ router.route('/auth_test')
 
 router.route('/login')
 	// GET - render login page
-	.get(render.login)
-	// POST - login action
-	.post(passport.authenticate('local-login', {
-		successRedirect: '/',
-		failureRedirect: '/fail'
-	}));
-
-router.route('/session_setup')
-	.get(auth.sessionSetup, auth.loggedRedirect);
-
-router.route('/logout')
-	.get(auth.isAuthenticated, auth.logout);
+	.get(render.login);
 
 module.exports = router;
