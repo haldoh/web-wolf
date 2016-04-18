@@ -96,7 +96,7 @@ var authCall = function (path, method, cookie, cookieJar, data, callback) {
 var buildRefUrl = function (returnUrl) {
 console.log(returnUrl);
 	// Base refUrl is the local callback for session setup
-	var refUrl = config.endpoint + '/session_setup';
+	var refUrl = config.endpoint + '/auth/session_setup';
 
 	// Add an URL for redirect if given
 	if (returnUrl)
