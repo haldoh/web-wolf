@@ -28,6 +28,8 @@ module.exports.isAuthenticated = function (req, res, next) {
  */
 module.exports.sessionSetup = function (req, res, next) {
 
+	console.log(req.headers);
+
 	// Try to get ref URL from request
 	var refUrl = req.query.hasOwnProperty('refUrl') ? encodeURIComponent(req.query.refUrl) : null;
 
@@ -41,7 +43,7 @@ module.exports.sessionSetup = function (req, res, next) {
 	// Store value in request
 	req.wolfAuthCookie = cookieValue;
 
-	// Trick passport in thinking that we have user and password
+	// Trick passport into thinking that we have user and password
 	req.body.username = 'user';
 	req.body.password = 'pwd';
 
