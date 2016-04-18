@@ -120,7 +120,8 @@ module.exports = function () {
 			// Set up request to auth layer
 			var url = require('../config/config').auth.endpoint + '/users/me';
 			var cookieJar = request.jar();
-			cookieJar.setCookie('connect.sid=' + req.wolfAuthCookie + '; path=/; domain=auth-wolf.herokuapp.com', 'https://auth-wolf.herokuapp.com/');
+			var cookie = request.cookie('connect.sid=' + req.wolfAuthCookie + '; path=/; domain=auth-wolf.herokuapp.com');
+			cookieJar.setCookie(cookie, 'https://auth-wolf.herokuapp.com/');
 			var options = {
 				url: url,
 				followAllRedirects: true,
