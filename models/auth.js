@@ -34,7 +34,7 @@ module.exports.sessionSetup = function (data, cookieJar, callback) {
 module.exports.facebookAuth = function (returnUrl, res) {
 
 	// Build refUrl parameter for oAuth login
-	var refUrl = refUrl(returnUrl);
+	var refUrl = buildRefUrl(returnUrl);
 
 	// Redirect to auth layer
 	return res.redirect('/auth/facebook?refUrl=' + refUrl);
@@ -44,7 +44,7 @@ module.exports.facebookAuth = function (returnUrl, res) {
 module.exports.twitterAuth = function (returnUrl, res) {
 
 	// Build refUrl parameter for oAuth login
-	var refUrl = refUrl(returnUrl);
+	var refUrl = buildRefUrl(returnUrl);
 
 	// Redirect to auth layer
 	return res.redirect('/auth/twitter?refUrl=' + refUrl);
@@ -54,7 +54,7 @@ module.exports.twitterAuth = function (returnUrl, res) {
 module.exports.googleAuth = function (returnUrl, res) {
 
 	// Build refUrl parameter for oAuth login
-	var refUrl = refUrl(returnUrl);
+	var refUrl = buildRefUrl(returnUrl);
 
 	// Redirect to auth layer
 	res.redirect('/auth/google?refUrl=' + refUrl);
@@ -93,7 +93,7 @@ var authCall = function (path, method, cookie, cookieJar, data, callback) {
 };
 
 // Build parameter for callback and redirect after external login
-var refUrl = function (returnUrl) {
+var buildRefUrl = function (returnUrl) {
 
 	// Base refUrl is the local callback for session setup
 	var refUrl = config.endpoint + '/session_setup';
