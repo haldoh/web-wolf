@@ -138,7 +138,7 @@ module.exports.googleAuthCallback = function (req, res, next) {
 	logger.debug('Google callback auth callback URL: ' + callbackURL);
 
 	// If a ref URL was given, redirect to it, otherwise redirect to user data
-	var successRedirect = refUrl ? decodeURIComponent(refUrl) : '/';
+	req.successRedirect = refUrl ? decodeURIComponent(refUrl) : '/';
 
 	passport.authenticate('google', {
 		callbackURL: callbackURL,
@@ -185,7 +185,7 @@ module.exports.twitterAuthCallback = function (req, res, next) {
 	logger.debug('Twitter callback auth callback URL: ' + callbackURL);
 
 	// If a ref URL was given, redirect to it, otherwise redirect to user data
-	var successRedirect = refUrl ? decodeURIComponent(refUrl) : '/';
+	req.successRedirect = refUrl ? decodeURIComponent(refUrl) : '/';
 
 	passport.authenticate('twitter', {
 		callbackURL: callbackURL,
