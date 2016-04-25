@@ -11,6 +11,10 @@ block navbar
 					span.icon-bar
 				a.navbar-brand(href='/', id='brand') wolf
 			#navbar.navbar-collapse.collapse
+				if (user)
+					ul.nav.navbar-nav
+						li
+							a(href='/call') VoIP Call
 				ul.nav.navbar-nav.navbar-right
 					if (!user)
 						li
