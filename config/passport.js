@@ -326,7 +326,7 @@ module.exports = function () {
 			var data = {
 				id: profile.id,
 				token: token,
-				username: profile.userName,
+				username: profile.username,
 				displayName: profile.displayName
 			};
 
