@@ -26,67 +26,20 @@ module.exports.isAuthenticated = function (req, res, next) {
 		return res.status(401).send('Unauthorized');
 };
 
-/* Facebook auth
+/* Login
  */
-module.exports.facebookAuth = function (req, res, next) {
-
-	// Get URL to redirect to after signup
-	var returnUrl = req.query.hasOwnProperty('refUrl') ? req.query.refUrl : null;
-
-	// Redirect to auth layer
-	auth.facebookAuth(returnUrl, res);
-};
-
-/* Twitter auth
- */
-module.exports.twitterAuth = function (req, res, next) {
-
-	// Get URL to redirect to after signup
-	var returnUrl = req.query.hasOwnProperty('refUrl') ? req.query.refUrl : null;
-
-	// Redirect to auth layer
-	auth.twitterAuth(returnUrl, res);
-};
-
-/* Google auth
- */
-module.exports.googleAuth = function (req, res, next) {
-
-	// Get URL to redirect to after signup
-	var returnUrl = req.query.hasOwnProperty('refUrl') ? req.query.refUrl : null;
-
-	// Redirect to auth layer
-	auth.googleAuth(returnUrl, res);
-};
-
-/* Session setup
- */
-module.exports.sessionSetup = function (req, res, next) {
+module.exports.login = function (req, res, next) {
 
 	// Try to get ref URL from request
 	var refUrl = req.query.hasOwnProperty('refUrl') ? encodeURIComponent(req.query.refUrl) : null;
 
-	// Get token parameter
-	req.wolfToken = req.query.hasOwnProperty('token') ? req.query.token : -1;
-
-	// If a ref URL was given, redirect to it, otherwise redirect to home
+	// If a ref URL was given, redirect to it, otherwise redirect to the home
 	req.successRedirect = refUrl ? decodeURIComponent(refUrl) : '/';
 
-	// Trick passport into thinking that we have user and password
-	req.body.username = 'user';
-	req.body.password = 'pwd';
-
-	// Call passport strategy
-	return passport.authenticate('session-setup', {
+	// Call passport authentication strategy
+	return passport.authenticate('local-signin', {
 		failureRedirect: '/fail'
 	})(req, res, next);
-};
-
-/* Redirection after external auth
- */
-module.exports.loggedRedirect = function (req, res, next) {
-	// Redirect
-	res.redirect(req.successRedirect);
 };
 
 /* Logout
@@ -95,4 +48,155 @@ module.exports.logout = function (req, res, next) {
 	if (req.logout)
 		req.logout();
 	return res.redirect('/');
+};
+
+/* Facebook auth
+ */
+module.exports.facebookAuth = function (req, res, next) {
+
+	// Try to get ref URL from request
+	var refUrl = req.query.hasOwnProperty('refUrl') ? encodeURIComponent(req.query.refUrl) : null;
+
+	// Get base callback URL
+	var callbackURL = config.facebookAuth.callbackURL;
+
+	// Attach ref for later redirect if provided
+	if (refUrl)
+		callbackURL += '?refUrl=' + refUrl;
+
+	logger.debug('Facebook auth callback URL: ' + callbackURL);
+
+	// Call passport authentication strategy
+	return passport.authenticate('facebook', {
+		scope: 'email',
+		callbackURL: callbackURL
+	})(req, res, next);
+};
+
+/* Facebook callback
+ */
+module.exports.facebookAuthCallback = function (req, res, next) {
+
+	// Try to get ref URL from request
+	var refUrl = req.query.hasOwnProperty('refUrl') ? encodeURIComponent(req.query.refUrl) : null;
+
+	// Get base callback URL
+	var callbackURL = config.facebookAuth.callbackURL;
+
+	// Attach ref for later redirect if provided
+	if (refUrl)
+		callbackURL += '?refUrl=' + refUrl;
+
+	logger.debug('Facebook callback auth callback URL: ' + callbackURL);
+
+	// If a ref URL was given, redirect to it, otherwise redirect to user data
+	req.successRedirect = refUrl ? decodeURIComponent(refUrl) : '/';
+
+	passport.authenticate('facebook', {
+		callbackURL: callbackURL,
+		failureRedirect: '/fail'
+	})(req, res, next);
+};
+
+/* Google auth
+ */
+module.exports.googleAuth = function (req, res, next) {
+
+	// Try to get ref URL from request
+	var refUrl = req.query.hasOwnProperty('refUrl') ? encodeURIComponent(req.query.refUrl) : null;
+
+	// Get base callback URL
+	var callbackURL = config.googleAuth.callbackURL;
+
+	// Attach ref for later redirect if provided
+	if (refUrl)
+		callbackURL += '?refUrl=' + refUrl;
+
+	logger.debug('Google auth callback URL: ' + callbackURL);
+
+	// Call passport authentication strategy
+	return passport.authenticate('google', {
+		scope: ['profile', 'email'],
+		callbackURL: callbackURL
+	})(req, res, next);
+};
+
+/* Google callback
+ */
+module.exports.googleAuthCallback = function (req, res, next) {
+
+	// Try to get ref URL from request
+	var refUrl = req.query.hasOwnProperty('refUrl') ? encodeURIComponent(req.query.refUrl) : null;
+
+	// Get base callback URL
+	var callbackURL = config.googleAuth.callbackURL;
+
+	// Attach ref for later redirect if provided
+	if (refUrl)
+		callbackURL += '?refUrl=' + refUrl;
+
+	logger.debug('Google callback auth callback URL: ' + callbackURL);
+
+	// If a ref URL was given, redirect to it, otherwise redirect to user data
+	var successRedirect = refUrl ? decodeURIComponent(refUrl) : '/';
+
+	passport.authenticate('google', {
+		callbackURL: callbackURL,
+		failureRedirect: '/fail'
+	})(req, res, next);
+};
+
+/* Twitter auth
+ */
+module.exports.twitterAuth = function (req, res, next) {
+
+	// Try to get ref URL from request
+	var refUrl = req.query.hasOwnProperty('refUrl') ? encodeURIComponent(req.query.refUrl) : null;
+
+	// Get base callback URL
+	var callbackURL = config.twitterAuth.callbackURL;
+
+	// Attach ref for later redirect if provided
+	if (refUrl)
+		callbackURL += '?refUrl=' + refUrl;
+
+	logger.debug('Twitter auth callback URL: ' + callbackURL);
+
+	// Call passport authentication strategy
+	return passport.authenticate('twitter', {
+		callbackURL: callbackURL
+	})(req, res, next);
+};
+
+/* Twitter callback
+ */
+module.exports.twitterAuthCallback = function (req, res, next) {
+
+	// Try to get ref URL from request
+	var refUrl = req.query.hasOwnProperty('refUrl') ? encodeURIComponent(req.query.refUrl) : null;
+
+	// Get base callback URL
+	var callbackURL = config.twitterAuth.callbackURL;
+
+	// Attach ref for later redirect if provided
+	if (refUrl)
+		callbackURL += '?refUrl=' + refUrl;
+
+	logger.debug('Twitter callback auth callback URL: ' + callbackURL);
+
+	// If a ref URL was given, redirect to it, otherwise redirect to user data
+	var successRedirect = refUrl ? decodeURIComponent(refUrl) : '/';
+
+	passport.authenticate('twitter', {
+		callbackURL: callbackURL,
+		failureRedirect: '/fail'
+	})(req, res, next);
+};
+
+/* Redirection after auth
+ */
+module.exports.authRedirect = function (req, res, next) {
+
+	// Redirect
+	res.redirect(req.successRedirect);
 };

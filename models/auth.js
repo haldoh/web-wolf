@@ -10,6 +10,8 @@
 "use strict";
 
 // Requires
+var jwt = require('jsonwebtoken');
+
 var config = require('../config/config');
 var logger = require('../config/logger');
 
@@ -17,53 +19,51 @@ var logger = require('../config/logger');
 
 // Get the user data from the auth layer
 module.exports.loggedUserData = function (user, callback) {
-	return authCall('/users/me', 'GET', user.connection, null, {}, callback);
+	return authCall('/users/me', 'GET', user.token, null, {}, callback);
 };
 
-// Auth layer local login
-module.exports.localLogin = function (data, cookieJar, callback) {
-	return authCall('/auth/login', 'POST', null, cookieJar, data, callback);
+// Auth layer local signin
+module.exports.localSignin = function (data, callback) {
+	return authCall('/auth/local/signin', 'POST', null, null, data, callback);
 };
 
-// Auth layer session setup for external auth
-module.exports.sessionSetup = function (data, cookieJar, callback) {
-	return authCall('/auth/session_setup', 'POST', null, cookieJar, data, callback);
+// Auth layer local signup
+module.exports.localSignup = function (data, callback) {
+	return authCall('/auth/local/signup', 'POST', null, null, data, callback);
 };
 
-// Facebook auth
-module.exports.facebookAuth = function (returnUrl, res) {
-
-	// Build refUrl parameter for oAuth login
-	var refUrl = buildRefUrl(returnUrl);
-
-	// Redirect to auth layer
-	return res.redirect(config.auth.endpoint + '/auth/facebook?refUrl=' + refUrl);
+// Facebook signin
+module.exports.facebookSignin = function (data, callback) {
+	return authCall('/auth/facebook/signin', 'POST', null, null, data, callback);
 };
 
-// Twitter auth
-module.exports.twitterAuth = function (returnUrl, res) {
-
-	// Build refUrl parameter for oAuth login
-	var refUrl = buildRefUrl(returnUrl);
-
-	// Redirect to auth layer
-	return res.redirect(config.auth.endpoint + '/auth/twitter?refUrl=' + refUrl);
+// Twitter signin
+module.exports.twitterSignin = function (data, callback) {
+	return authCall('/auth/twitter/signin', 'POST', null, null, data, callback);
 };
 
-// Google auth
-module.exports.googleAuth = function (returnUrl, res) {
+// Google signin
+module.exports.googleSignin = function (data, callback) {
+	return authCall('/auth/google/signin', 'POST', null, null, data, callback);
+};
 
-	// Build refUrl parameter for oAuth login
-	var refUrl = buildRefUrl(returnUrl);
+// Verify a user token
+module.exports.verifyUserToken = function (token, callback) {
 
-	// Redirect to auth layer
-	res.redirect(config.auth.endpoint + '/auth/google?refUrl=' + refUrl);
+	// Secret
+	var secret = config.jwtSecret;
+
+	// Options
+	var options = {};
+
+	// Verify token
+	jwt.verify(token, secret, options, callback);
 };
 
 /*** PRIVATE FUNCTIONS ***/
 
 // Basic template for calls to the auth layer
-var authCall = function (path, method, cookie, cookieJar, data, callback) {
+var authCall = function (path, method, token, cookieJar, data, callback) {
 
 	// Configure request options
 	var options = {
@@ -84,9 +84,9 @@ var authCall = function (path, method, cookie, cookieJar, data, callback) {
 	if (cookieJar)
 		options.jar = cookieJar;
 
-	// Add cookie if given
-	if (cookie)
-		options.headers.cookie = 'connect.sid=' + cookie;
+	// Add user token if given
+	if (token)
+		options.headers['x-wolf-user-token'] = token;
 
 	// Call auth layer
 	return require('request')(options, callback);

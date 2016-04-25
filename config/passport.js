@@ -12,6 +12,10 @@
 // Requires
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
+var FacebookStrategy = require('passport-facebook').Strategy;
+var TwitterStrategy = require('passport-twitter').Strategy;
+var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
+
 var request = require('request');
 
 var auth = require('../models/auth');
@@ -35,7 +39,7 @@ module.exports = function () {
 
 	/* Local login
 	 */
-	passport.use('local-login', new LocalStrategy({
+	passport.use('local-signin', new LocalStrategy({
 
 			// Define fields used to identify user
 			usernameField: 'email',
@@ -44,12 +48,6 @@ module.exports = function () {
 		},
 		function (req, email, password, done) {
 
-			// Full login URL
-			var url = config.auth.endpoint + '/auth/login';
-
-			// Custom cookie jar for call
-			var cookieJar = request.jar();
-
 			// Login data
 			var data = {
 				email: email,
@@ -57,18 +55,18 @@ module.exports = function () {
 			};
 
 			// Call auth layer local login
-			auth.localLogin(data, cookieJar, function (err, resp, body) {
+			auth.localSignin(data, function (err, resp, body) {
 
 				// Login error
 				if (err) {
-					logger.warn('Error calling auth login: ' + err);
+					logger.warn('Error calling auth layer for local signin: ' + err);
 					return done(err);
 				}
 
 				// Bad response from auth layer
 				else if (resp.statusCode < 200 || resp.statusCode > 399) {
-					logger.warn('Bad response from auth layer: ' + JSON.stringify(resp));
-					return done(new Error('Bad response from auth layer: ' + JSON.stringify(resp)));
+					logger.warn('Bad response from auth layer for local signin: ' + JSON.stringify(resp));
+					return done(new Error('Bad response from auth layer for local signin: ' + JSON.stringify(resp)));
 				}
 
 				// Login OK - process user data
@@ -80,25 +78,29 @@ module.exports = function () {
 						bodyObj = JSON.parse(body);
 					} catch (e) {
 						// Log errors and return
-						logger.warn('Error parsing login response body - error: ' + e);
-						logger.warn('Error parsing login response body - body: ' + body);
+						logger.warn('Error parsing response body for local signin - error: ' + e);
+						logger.warn('Error parsing response body for local signin - body: ' + body);
 						return done(e);
 					}
 
-					// Return user data
-					return done(null, {
-						id: bodyObj._id,
-						email: bodyObj.email,
-						displayName: bodyObj.displayName,
-						facebook: bodyObj.facebook,
-						google: bodyObj.google,
-						twitter: bodyObj.twitter,
-						connection: cookieJar.getCookies(url)[0].value
+					// Decode received token
+					return auth.verifyUserToken(bodyObj.token, function (tokenErr, decoded) {
+						if (tokenErr) {
+							logger.warn('Error decoding user token for local signin: ' + tokenErr);
+							return done(tokenErr);
+						} else {
+
+							// Return user data
+							return done(null, {
+								id: decoded.id,
+								displayName: decoded.displayName,
+								token: bodyObj.token
+							});
+						}
 					});
 				}
 			});
 		}));
-
 
 	/* Local signup
 	 */
@@ -110,43 +112,29 @@ module.exports = function () {
 			passReqToCallback: true // Pass back the entire request to the callback
 		},
 		function (req, email, password, done) {
-			// TODO
-		}));
-
-	/* Session setup with token
-	 */
-	passport.use('session-setup', new LocalStrategy({
-
-			passReqToCallback: true // Pass back the entire request to the callback
-		},
-		function (req, username, password, done) {
-
-			// Full request URL
-			var url = config.auth.endpoint + '/auth/session_setup';
 			
-			// Custom cookie jar for call
-			var cookieJar = request.jar();
-
 			// Login data
 			var data = {
-				token: req.wolfToken
+				email: email,
+				password: password
 			};
-			
-			auth.sessionSetup(data, cookieJar, function (err, resp, body) {
 
-				// Error
+			// Call auth layer local login
+			auth.localSignup(data, function (err, resp, body) {
+
+				// Login error
 				if (err) {
-					logger.warn('Error calling session setup call: ' + err);
+					logger.warn('Error calling auth layer for local signup: ' + err);
 					return done(err);
 				}
 
 				// Bad response from auth layer
 				else if (resp.statusCode < 200 || resp.statusCode > 399) {
-					logger.warn('Bad response from session setup call: ' + JSON.stringify(resp));
-					return done(new Error('Bad response from session setup call: ' + JSON.stringify(resp)));
+					logger.warn('Bad response from auth layer for local signup: ' + JSON.stringify(resp));
+					return done(new Error('Bad response from auth layer for local signup: ' + JSON.stringify(resp)));
 				}
 
-				// OK - process user data
+				// Signup OK - process user data
 				else {
 
 					// Parse response body
@@ -155,20 +143,236 @@ module.exports = function () {
 						bodyObj = JSON.parse(body);
 					} catch (e) {
 						// Log errors and return
-						logger.warn('Error parsing user data response body - error: ' + e);
-						logger.warn('Error parsing user data response body - body: ' + body);
+						logger.warn('Error parsing response body for local signup - error: ' + e);
+						logger.warn('Error parsing response body for local signup - body: ' + body);
 						return done(e);
 					}
 
-					// Return user data
-					return done(null, {
-						id: bodyObj._id,
-						email: bodyObj.email,
-						displayName: bodyObj.displayName,
-						facebook: bodyObj.facebook,
-						google: bodyObj.google,
-						twitter: bodyObj.twitter,
-						connection: cookieJar.getCookies(url)[0].value
+					// Decode received token
+					return auth.verifyUserToken(bodyObj.token, function (tokenErr, decoded) {
+						if (tokenErr) {
+							logger.warn('Error decoding user token for local signup: ' + tokenErr);
+							return done(tokenErr);
+						} else {
+
+							// Return user data
+							return done(null, {
+								id: decoded.id,
+								displayName: decoded.displayName,
+								token: bodyObj.token
+							});
+						}
+					});
+				}
+			});
+		}));
+
+	/* Facebook auth
+	 */
+	passport.use(new FacebookStrategy({
+
+			// Application credentials
+			clientID: config.facebookAuth.clientID,
+			clientSecret: config.facebookAuth.clientSecret
+		},
+
+		// Facebook sends back the token and profile
+		function (token, refreshToken, profile, done) {
+
+			// Send Facebook data to auth layer
+
+			// Data
+			var data = {
+				id: profile.id,
+				token: token,
+				email: profile.emails && 0 in profile.emails ? profile.emails[0].value : null,
+				name: profile.displayName
+			};
+
+			// Call auth layer facebook signin
+			auth.facebookSignin(data, function (err, resp, body) {
+
+				// Login error
+				if (err) {
+					logger.warn('Error calling auth facebook signin: ' + err);
+					return done(err);
+				}
+
+				// Bad response from auth layer
+				else if (resp.statusCode < 200 || resp.statusCode > 399) {
+					logger.warn('Bad response from auth layer for facebook signin: ' + JSON.stringify(resp));
+					return done(new Error('Bad response from auth layer for facebook signin: ' + JSON.stringify(resp)));
+				}
+
+				// Login OK - process user data
+				else {
+
+					// Parse response body
+					var bodyObj;
+					try {
+						bodyObj = JSON.parse(body);
+					} catch (e) {
+						// Log errors and return
+						logger.warn('Error parsing response body for facebook signin - error: ' + e);
+						logger.warn('Error parsing response body for facebook signin - body: ' + body);
+						return done(e);
+					}
+
+					// Decode received token
+					return auth.verifyUserToken(bodyObj.token, function (tokenErr, decoded) {
+						if (tokenErr) {
+							logger.warn('Error decoding user token for facebook signin: ' + tokenErr);
+							return done(tokenErr);
+						} else {
+
+							// Return user data
+							return done(null, {
+								id: decoded.id,
+								displayName: decoded.displayName,
+								token: bodyObj.token
+							});
+						}
+					});
+				}
+			});
+		}));
+
+	/* Google auth
+	 */
+	passport.use(new GoogleStrategy({
+
+			// Application credentials
+			clientID: config.googleAuth.clientID,
+			clientSecret: config.googleAuth.clientSecret
+		},
+
+		// Google sends back the token and profile
+		function (token, refreshToken, profile, done) {
+
+			// Send Google data to auth layer
+
+			// Data
+			var data = {
+				id: profile.id,
+				token: token,
+				email: profile.emails && 0 in profile.emails ? profile.emails[0].value : null,
+				name: profile.displayName
+			};
+
+			// Call auth layer google signin
+			auth.googleSignin(data, function (err, resp, body) {
+
+				// Login error
+				if (err) {
+					logger.warn('Error calling auth google signin: ' + err);
+					return done(err);
+				}
+
+				// Bad response from auth layer
+				else if (resp.statusCode < 200 || resp.statusCode > 399) {
+					logger.warn('Bad response from auth layer for google signin: ' + JSON.stringify(resp));
+					return done(new Error('Bad response from auth layer for google signin: ' + JSON.stringify(resp)));
+				}
+
+				// Login OK - process user data
+				else {
+
+					// Parse response body
+					var bodyObj;
+					try {
+						bodyObj = JSON.parse(body);
+					} catch (e) {
+						// Log errors and return
+						logger.warn('Error parsing response body for google signin - error: ' + e);
+						logger.warn('Error parsing response body for google signin - body: ' + body);
+						return done(e);
+					}
+
+					// Decode received token
+					return auth.verifyUserToken(bodyObj.token, function (tokenErr, decoded) {
+						if (tokenErr) {
+							logger.warn('Error decoding user token for google signin: ' + tokenErr);
+							return done(tokenErr);
+						} else {
+
+							// Return user data
+							return done(null, {
+								id: decoded.id,
+								displayName: decoded.displayName,
+								token: bodyObj.token
+							});
+						}
+					});
+				}
+			});
+		}));
+
+
+	/* Twitter auth
+	 */
+	passport.use(new TwitterStrategy({
+
+			// Application credentials
+			consumerKey: config.twitterAuth.consumerKey,
+			consumerSecret: config.twitterAuth.consumerSecret
+		},
+
+		// Twitter sends back the token and profile
+		function (token, tokenSecret, profile, done) {
+
+			// Send Twitter data to auth layer
+
+			// Data
+			var data = {
+				id: profile.id,
+				token: token,
+				username: profile.userName,
+				displayName: profile.displayName
+			};
+
+			// Call auth layer twitter signin
+			auth.twitterSignin(data, function (err, resp, body) {
+
+				// Login error
+				if (err) {
+					logger.warn('Error calling auth twitter signin: ' + err);
+					return done(err);
+				}
+
+				// Bad response from auth layer
+				else if (resp.statusCode < 200 || resp.statusCode > 399) {
+					logger.warn('Bad response from auth layer for twitter signin: ' + JSON.stringify(resp));
+					return done(new Error('Bad response from auth layer for twitter signin: ' + JSON.stringify(resp)));
+				}
+
+				// Login OK - process user data
+				else {
+
+					// Parse response body
+					var bodyObj;
+					try {
+						bodyObj = JSON.parse(body);
+					} catch (e) {
+						// Log errors and return
+						logger.warn('Error parsing response body for twitter signin - error: ' + e);
+						logger.warn('Error parsing response body for twitter signin - body: ' + body);
+						return done(e);
+					}
+
+					// Decode received token
+					return auth.verifyUserToken(bodyObj.token, function (tokenErr, decoded) {
+						if (tokenErr) {
+							logger.warn('Error decoding user token for twitter signin: ' + tokenErr);
+							return done(tokenErr);
+						} else {
+
+							// Return user data
+							return done(null, {
+								id: decoded.id,
+								displayName: decoded.displayName,
+								token: bodyObj.token
+							});
+						}
 					});
 				}
 			});

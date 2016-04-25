@@ -23,6 +23,7 @@ var config = {
 		endpoint: endpoint.local,
 		port: 4000,
 		sessionSecret: 'localSessionSecret',
+		jwtSecret: 'localJwtSecret',
 		morgan: 'REQ :remote-addr - :remote-user  ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent" - :response-time',
 		// mongo: {
 		// 	uri: 'mongodb://localhost:27017/web'
@@ -34,6 +35,21 @@ var config = {
 			endpoint: 'http://localhost:3000',
 			platform: 'web-wolf',
 			token: 'localhost_web_token'
+		},
+		googleAuth: {
+			clientID: 'process.env.GOOGLE_CLIENT_ID',
+			clientSecret: 'process.env.GOOGLE_CLIENT_SECRET',
+			callbackURL: '/auth/google/callback'
+		},
+		facebookAuth: {
+			clientID: '1164717263579046',
+			clientSecret: 'c42f6d29e918e065f9c5ff8c4f4fd3ae',
+			callbackURL: '/auth/facebook/callback/'
+		},
+		twitterAuth: {
+			consumerKey: 'process.env.TWITTER_CONSUMER_KEY',
+			consumerSecret: 'process.env.TWITTER_CONSUMER_SECRET',
+			callbackURL: '/auth/twitter/callback'
 		}
 	},
 
@@ -43,6 +59,7 @@ var config = {
 		endpoint: endpoint.heroku,
 		port: process.env.PORT,
 		sessionSecret: process.env.SESSION_SECRET,
+		jwtSecret: process.env.JWT_SECRET,
 		morgan: 'REQ :remote-addr - :remote-user  ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent" - :response-time',
 		// mongo: {
 		// 	uri: process.env.MONGOLAB_URI
@@ -54,6 +71,21 @@ var config = {
 			endpoint: 'https://auth-wolf.herokuapp.com',
 			platform: process.env.AUTH_PLATFORM,
 			token: process.env.AUTH_TOKEN
+		},
+		googleAuth: {
+			clientID: process.env.GOOGLE_CLIENT_ID,
+			clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+			callbackURL: endpoint.heroku + '/auth/google/callback'
+		},
+		facebookAuth: {
+			clientID: process.env.FACEBOOK_APP_ID,
+			clientSecret: process.env.FACEBOOK_APP_SECRET,
+			callbackURL: endpoint.heroku + '/auth/facebook/callback'
+		},
+		twitterAuth: {
+			consumerKey: process.env.TWITTER_CONSUMER_KEY,
+			consumerSecret: process.env.TWITTER_CONSUMER_SECRET,
+			callbackURL: endpoint.heroku + '/auth/twitter/callback'
 		}
 	}
 };
