@@ -14,10 +14,15 @@ var router = express.Router();
 var passport = require('passport');
 
 var render = require('../controllers/render');
+var auth = require('../controllers/auth');
 
 router.route('/')
 	// GET - render home page
 	.get(render.home);
+
+router.route('/call')
+	// GET - render home page
+	.get(auth.isAuthenticated, render.voipCall);
 
 router.route('/local_test')
 	// GET - render local user info
