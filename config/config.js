@@ -36,6 +36,11 @@ var config = {
 			platform: 'web-wolf',
 			token: 'localhost_web_token'
 		},
+		voip: {
+			endpoint: 'http://localhost:5000',
+			platform: 'web-wolf',
+			token: 'localhost_web_token'
+		},
 		googleAuth: {
 			clientID: 'process.env.GOOGLE_CLIENT_ID',
 			clientSecret: 'process.env.GOOGLE_CLIENT_SECRET',
@@ -69,8 +74,13 @@ var config = {
 		},
 		auth: {
 			endpoint: 'https://auth-wolf.herokuapp.com',
-			platform: process.env.AUTH_PLATFORM,
+			platform: process.env.PLATFORM,
 			token: process.env.AUTH_TOKEN
+		},
+		voip: {
+			endpoint: 'https://voip-wolf.herokuapp.com',
+			platform: process.env.PLATFORM,
+			token: process.env.VOIP_TOKEN
 		},
 		googleAuth: {
 			clientID: process.env.GOOGLE_CLIENT_ID,
