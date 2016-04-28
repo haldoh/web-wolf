@@ -36,4 +36,8 @@ router.route('/login')
 	// GET - render login page
 	.get(render.login);
 
+router.route('/signup')
+	// GET - render signup page
+	.get(render.signup);
+
 module.exports = router;

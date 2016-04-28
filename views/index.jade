@@ -7,11 +7,15 @@ block content
 			p.lead Web server for Wolf's applications.
 			if (!user)
 				p
-					a(href='/login') Login
+					a(href='/Login')
+						button.btn.btn-default.btn-fixed.add-btn(type="button") Login
+				p
+					a(href='/signup')
+						button.btn.btn-default.btn-fixed.add-btn(type="button") Signup
 				p or
 				p
 					a(href='/auth/facebook')
-						button.btn.btn-default.add-btn(type="button") Login with Facebook
+						button.btn.btn-default.btn-fixed.add-btn(type="button") Login with Facebook
 				p
 					a(href='/auth/twitter')
-						button.btn.btn-default.add-btn(type="button") Login with Twitter
+						button.btn.btn-default.btn-fixed.dd-btn(type="button") Login with Twitter

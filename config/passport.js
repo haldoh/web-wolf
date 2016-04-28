@@ -57,6 +57,8 @@ module.exports = function () {
 			// Call auth layer local login
 			auth.localSignin(data, function (err, resp, body) {
 
+				var bodyObj;
+
 				// Login error
 				if (err) {
 					logger.warn('Error calling auth layer for local signin: ' + err);
@@ -65,15 +67,39 @@ module.exports = function () {
 
 				// Bad response from auth layer
 				else if (resp.statusCode < 200 || resp.statusCode > 399) {
+
 					logger.warn('Bad response from auth layer for local signin: ' + JSON.stringify(resp));
-					return done(new Error('Bad response from auth layer for local signin: ' + JSON.stringify(resp)));
+
+					// Parse response body
+					try {
+						bodyObj = JSON.parse(body);
+					} catch (e) {
+						// Log errors and return
+						logger.warn('Error parsing response body for local signin - error: ' + e);
+						logger.warn('Error parsing response body for local signin - body: ' + body);
+						return done(e);
+					}
+
+					// Manage auth layer error
+					switch (bodyObj.error_code) {
+						case '500.1':
+							// Internal error of auth layer
+							return done(null, false, req.flash('login', 'Authentication error. Please try again in a few moments.'));
+						case '404.1':
+							// User not found
+							return done(null, false, req.flash('login', 'User not found.'));
+						case '400.2':
+							// Wrong password
+							return done(null, false, req.flash('login', 'Passsword do not match given user.'));
+						default:
+							return done(new Error('Bad response from auth layer for local signin: ' + JSON.stringify(resp)));
+					}
 				}
 
 				// Login OK - process user data
 				else {
 
 					// Parse response body
-					var bodyObj;
 					try {
 						bodyObj = JSON.parse(body);
 					} catch (e) {
@@ -122,6 +148,8 @@ module.exports = function () {
 			// Call auth layer local login
 			auth.localSignup(data, function (err, resp, body) {
 
+				var bodyObj;
+
 				// Login error
 				if (err) {
 					logger.warn('Error calling auth layer for local signup: ' + err);
@@ -130,15 +158,36 @@ module.exports = function () {
 
 				// Bad response from auth layer
 				else if (resp.statusCode < 200 || resp.statusCode > 399) {
+					
 					logger.warn('Bad response from auth layer for local signup: ' + JSON.stringify(resp));
-					return done(new Error('Bad response from auth layer for local signup: ' + JSON.stringify(resp)));
+
+					// Parse response body
+					try {
+						bodyObj = JSON.parse(body);
+					} catch (e) {
+						// Log errors and return
+						logger.warn('Error parsing response body for local signup - error: ' + e);
+						logger.warn('Error parsing response body for local signup - body: ' + body);
+						return done(e);
+					}
+
+					// Manage auth layer error
+					switch (bodyObj.error_code) {
+						case '500.1':
+							// Internal error of auth layer
+							return done(null, false, req.flash('signup', 'Authentication error. Please try again in a few moments.'));
+						case '400.2':
+							// Email in use
+							return done(null, false, req.flash('signup', 'Email already in use.'));
+						default:
+							return done(new Error('Bad response from auth layer for local signup: ' + JSON.stringify(resp)));
+					}
 				}
 
 				// Signup OK - process user data
 				else {
 
 					// Parse response body
-					var bodyObj;
 					try {
 						bodyObj = JSON.parse(body);
 					} catch (e) {

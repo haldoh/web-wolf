@@ -14,6 +14,7 @@ var express = require('express');
 var session = require('express-session');
 var serveStatic = require('serve-static');
 var redisStore = require('connect-redis')(session);
+var flash = require('connect-flash');
 var bodyParser = require('body-parser');
 var morgan = require('morgan');
 var passport = require('passport');
@@ -68,6 +69,7 @@ module.exports = function () {
 	}));
 	app.use(passport.initialize());
 	app.use(passport.session());
+	app.use(flash());
 
 
 	/*

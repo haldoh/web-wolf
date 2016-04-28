@@ -29,7 +29,17 @@ module.exports.login = function (req, res, next) {
 
 	return res.render('login', {
 		title: 'Login',
-		user: req.user
+		user: req.user,
+		message: req.flash('login')
+	});
+};
+
+module.exports.signup = function (req, res, next) {
+
+	return res.render('signup', {
+		title: 'Signup',
+		user: req.user,
+		message: req.flash('signup')
 	});
 };
 

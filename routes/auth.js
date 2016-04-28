@@ -19,6 +19,10 @@ router.route('/login')
 	// POST - login action
 	.post(auth.login, auth.authRedirect);
 
+router.route('/signup')
+	// POST - signup action
+	.post(auth.signup, auth.authRedirect);
+
 router.route('/logout')
 	// GET - Logout
 	.get(auth.isAuthenticated, auth.logout);

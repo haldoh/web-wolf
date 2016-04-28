@@ -30,15 +30,49 @@ module.exports.isAuthenticated = function (req, res, next) {
  */
 module.exports.login = function (req, res, next) {
 
+	// Check input
+	if (!req.body.email)
+		req.flash('login', 'Please enter a valid email.');
+	if (!req.body.password)
+		req.flash('login', 'Please enter a valid password.');
+
 	// Try to get ref URL from request
 	var refUrl = req.query.hasOwnProperty('refUrl') ? encodeURIComponent(req.query.refUrl) : null;
 
 	// If a ref URL was given, redirect to it, otherwise redirect to the home
 	req.successRedirect = refUrl ? decodeURIComponent(refUrl) : '/';
 
+	// Failure redirect
+	var failureRedirect = refUrl ? '/login?refUrl=' + refUrl : '/login';
+
 	// Call passport authentication strategy
 	return passport.authenticate('local-signin', {
-		failureRedirect: '/fail'
+		failureRedirect: failureRedirect
+	})(req, res, next);
+};
+
+/* Signup
+ */
+module.exports.signup = function (req, res, next) {
+
+	// Check input
+	if (!req.body.email)
+		req.flash('signup', 'Please enter a valid email.');
+	if (!req.body.password || !req.body.password_confirm)
+		req.flash('signup', 'Please enter a valid password.');
+
+	// Try to get ref URL from request
+	var refUrl = req.query.hasOwnProperty('refUrl') ? encodeURIComponent(req.query.refUrl) : null;
+
+	// If a ref URL was given, redirect to it, otherwise redirect to the home
+	req.successRedirect = refUrl ? decodeURIComponent(refUrl) : '/';
+
+	// Failure redirect
+	var failureRedirect = refUrl ? '/signup?refUrl=' + refUrl : '/signup';
+
+	// Call passport authentication strategy
+	return passport.authenticate('local-signup', {
+		failureRedirect: failureRedirect
 	})(req, res, next);
 };
 
