@@ -90,6 +90,8 @@ module.exports = function () {
 	app.use('/', require('../routes/static'));
 	// Auth routes
 	app.use('/auth', require('../routes/auth'));
+	// Threads routes
+	app.use('/threads', require('../routes/threads'));
 
 	/*
 	 * HTTP server setup

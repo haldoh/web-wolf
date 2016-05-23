@@ -20,6 +20,10 @@ router.route('/')
 	// GET - render home page
 	.get(render.home);
 
+router.route('/board')
+	// GET - render board page
+	.get(auth.isAuthenticated, render.board);
+
 router.route('/call')
 	// GET - render home page
 	.get(auth.isAuthenticated, render.voipCall);

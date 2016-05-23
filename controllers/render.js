@@ -83,6 +83,13 @@ module.exports.voipCall = function (req, res, next) {
 	});
 };
 
+module.exports.board = function (req, res, next) {
+	res.render('board', {
+		title: 'Board',
+		user: req.user
+	});
+};
+
 // Remote user info test
 module.exports.authTest = function (req, res, next) {
 	

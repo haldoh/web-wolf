@@ -1,0 +1,130 @@
+extends layout-nav
+
+block headscripts
+	script(type='text/javascript' src='/javascripts/lib/angular.min.js')
+	script(type='text/javascript' src='/javascripts/lib/angular-ui-router.min.js')
+	script(type='text/javascript' src='/javascripts/angular/board/services.js')
+	script(type='text/javascript' src='/javascripts/angular/board/app.js')
+	script(type='text/javascript' src='/javascripts/angular/board/controllers.js')
+
+block content
+	div(ui-view)
+	// home.html - threads list
+	script(type="text/ng-template" id="/board.html")
+		.row.starter-template
+			.col-md-12
+				h2 wolf board test platform
+				button.btn.btn-primary(ng-hide="threadForm", ng-click="showForm()") Start a new thread
+				form(ng-show="threadForm", ng-submit="newThread()", id="newThreadForm")
+					.form-group
+						label.sr-only(for="title") Title
+						input.form-control(type="text", name="title", id="title", ng-model="title", placeholder="Title of your new thread")
+					.form-group
+						label.sr-only(for="text") Text
+						textarea.form-control(form="newThreadForm", name="text", id="text", ng-model="text", placeholder="Write text here")
+					button.btn.btn-primary(type="submit") Create
+					button.btn.btn-default(ng-show="threadForm", ng-click="hideForm()") Cancel
+		.row(ng-show="noThreads").text-center
+			p.lead No threads to show
+		.row(ng-repeat="thread in threads | orderBy:'-updated'")
+			.col-md-1.text-center.votes-box
+				p
+					h4
+						span.glyphicon.glyphicon-chevron-up.green.vote-button(ng-class="{off: thread.voted !== 1, on: thread.voted === 1}", ng-click="upvote(thread._id)")
+						| {{ thread.upvotes - thread.downvotes }}
+						span.glyphicon.glyphicon-chevron-down.red.vote-button(ng-class="{off: thread.voted !== -1, on: thread.voted === -1}", ng-click="downvote(thread._id)")
+					p.thread-votes (+{{ thread.upvotes }}/-{{ thread.downvotes }})
+			.col-md-11.thread-list-content
+				p
+					h4
+						a(href="#!/threads/{{ thread._id }}")
+							{{ thread.title }}
+						span.author-text  - {{ thread.author.displayName }}
+					ng-pluralize(count="thread.messagesNumber" when="{'1': '1 message', 'other': '{{ thread.messagesNumber }} messages'}")
+					|  - 
+					ng-pluralize(count="thread.commentsNumber" when="{'1': '1 comment', 'other': '{{ thread.commentsNumber }} comments'}")
+					|  - last update: {{ thread.time | date:'dd/MM/yyyy HH:mm:ss' }}
+
+	// thread.html - single thread page
+	script(type="text/ng-template" id="/thread.html")
+		.row
+			.col-md-12
+				h3 {{ thread.title }}
+		.row.thread-box
+			.row
+				.col-md-1.text-center.votes-box
+					p
+						h4
+							span.glyphicon.glyphicon-chevron-up.green.vote-button(ng-class="{off: thread.voted !== 1, on: thread.voted === 1}", ng-click="upvote()")
+							| {{ thread.upvotes - thread.downvotes }}
+							span.glyphicon.glyphicon-chevron-down.red.vote-button(ng-class="{off: thread.voted !== -1, on: thread.voted === -1}", ng-click="downvote()")
+						p.thread-votes (+{{ thread.upvotes }}/-{{ thread.downvotes }})
+				.col-md-11.thread-content-box
+					p.thread-text {{ thread.text }}
+			.row
+				.col-md-1
+				.col-md-11
+					p.thread-details {{ thread.author.displayName }}
+						|  - {{ thread.time | date:'dd/MM/yyyy HH:mm:ss' }}
+		.row
+			.col-md-12
+				h4
+					ng-pluralize(count="thread.messagesNumber" when="{'1': '1 message', 'other': '{{ thread.messagesNumber }} messages'}")
+		.msg-cont(ng-repeat="message in thread.messages")
+			.row.thread-box
+				.row
+					.col-md-1.text-center.votes-box
+						p
+							h4
+								span.glyphicon.glyphicon-chevron-up.green.vote-button(ng-class="{off: message.voted !== 1, on: message.voted === 1}", ng-click="upvoteMessage(message)")
+								| {{ message.upvotes - message.downvotes }}
+								span.glyphicon.glyphicon-chevron-down.red.vote-button(ng-class="{off: message.voted !== -1, on: message.voted === -1}", ng-click="downvoteMessage(message)")
+							p.message-votes (+{{ message.upvotes }}/-{{ message.downvotes }})
+					.col-md-11
+						p.thread-text {{ message.text }}
+				.row
+					.col-md-1
+					.col-md-11
+						p.thread-details {{ message.author.displayName }} - 
+							| {{ message.time | date:'dd/MM/yyyy HH:mm:ss' }}
+			.msg-cont(ng-repeat="comment in message.comments")
+				.row
+					.col-md-1
+					.col-md-11
+						.row.thread-box
+							.row
+								.col-md-1.text-center.votes-box
+									p
+										h5
+											span.glyphicon.glyphicon-chevron-up.green.vote-button(ng-class="{off: comment.voted !== 1, on: comment.voted === 1}", ng-click="upvoteComment(message._id, comment)")
+											| {{ comment.upvotes - comment.downvotes }}
+											span.glyphicon.glyphicon-chevron-down.red.vote-button(ng-class="{off: comment.voted !== -1, on: comment.voted === -1}", ng-click="downvoteComment(message._id, comment)")
+										p.comment-votes (+{{ comment.upvotes }}/-{{ comment.downvotes }})
+								.col-md-11
+									p.thread-text {{ comment.text }}
+							.row
+								.col-md-1
+								.col-md-11
+									p.thread-details {{ comment.author.displayName }} - 
+										| {{ comment.time | date:'dd/MM/yyyy HH:mm:ss' }}
+			.row
+				.col-md-1
+				.col-md-1
+				.col-md-10
+					a.comment-form-link(ng-hide="commentForm[message._id]", ng-click="showCommentForm(message._id)")
+						| Add a comment
+					form.form-inline(ng-show="commentForm[message._id]" ng-submit="sendComment(message)")
+						.form-group
+							label.sr-only(for="comText") Comment
+							input.form-control(type="text", name="comText", id="comText", ng-model="comText[message._id]", placeholder="Comment this message...")
+							button.btn.btn-primary(type="submit") Send
+							button.btn.btn-default(ng-click="hideCommentForm(message._id)") Cancel
+		.row
+			.row.thread-box
+				.col-md-12.new-message
+					p.lead Your message
+					form(ng-submit="sendMessage()", id="newMessageForm")
+						.form-group
+							label.sr-only(for="msgText") Message
+							textarea.form-control(form="newMessageForm", name="msgText", id="msgText", ng-model="msgText", placeholder="Add a message...")
+						button.btn.btn-primary(type="submit") Send

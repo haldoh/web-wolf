@@ -32,8 +32,8 @@ var voipCall = function (path, method, token, cookieJar, data, callback) {
 		method: method,
 		followAllRedirects: true,
 		headers: {
-			'x-wolf-voip-platform': config.voip.platform,
-			'x-wolf-voip-token': config.voip.token
+			'x-wolf-platform': config.voip.platform,
+			'x-wolf-token': config.voip.token
 		}
 	};
 

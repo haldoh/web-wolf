@@ -37,7 +37,12 @@ var config = {
 			token: 'localhost_web_token'
 		},
 		voip: {
-			endpoint: 'http://localhost:5000',
+			endpoint: 'http://localhost:3200',
+			platform: 'web-wolf',
+			token: 'localhost_web_token'
+		},
+		board: {
+			endpoint: 'http://localhost:3100',
 			platform: 'web-wolf',
 			token: 'localhost_web_token'
 		},
@@ -81,6 +86,11 @@ var config = {
 			endpoint: 'https://voip-wolf.herokuapp.com',
 			platform: process.env.PLATFORM,
 			token: process.env.VOIP_TOKEN
+		},
+		board: {
+			endpoint: 'https://board-wolf.herokuapp.com',
+			platform: process.env.PLATFORM,
+			token: process.env.BOARD_TOKEN
 		},
 		googleAuth: {
 			clientID: process.env.GOOGLE_CLIENT_ID,
