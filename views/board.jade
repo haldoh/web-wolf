@@ -66,6 +66,7 @@ block content
 				.col-md-11
 					p.thread-details {{ thread.author.displayName }}
 						|  - {{ thread.time | date:'dd/MM/yyyy HH:mm:ss' }}
+						span(ng-show="thread.owned")  - Edit - Delete
 		.row
 			.col-md-12
 				h4
@@ -87,6 +88,7 @@ block content
 					.col-md-11
 						p.thread-details {{ message.author.displayName }} - 
 							| {{ message.time | date:'dd/MM/yyyy HH:mm:ss' }}
+							span(ng-show="message.owned")  - Edit - Delete
 			.msg-cont(ng-repeat="comment in message.comments")
 				.row
 					.col-md-1
@@ -107,6 +109,7 @@ block content
 								.col-md-11
 									p.thread-details {{ comment.author.displayName }} - 
 										| {{ comment.time | date:'dd/MM/yyyy HH:mm:ss' }}
+										span(ng-show="comment.owned")  - Edit - Delete
 			.row
 				.col-md-1
 				.col-md-1
