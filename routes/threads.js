@@ -17,7 +17,9 @@ router.route('/:threadid')
 	// GET - get a single thread
 	.get(auth.isAuthenticated, threads.get)
 	// POST - post a message to this thread
-	.post(auth.isAuthenticated, threads.newMessage);
+	.post(auth.isAuthenticated, threads.newMessage)
+	// PUT - post a message to this thread
+	.put(auth.isAuthenticated, threads.edit);
 
 router.route('/:threadid/vote')
 	// PUT - upvote a thread

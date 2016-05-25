@@ -39,9 +39,7 @@ angular.module('board').controller('BoardCtrl', [
 			}
 			threads.newThread({
 				title: $scope.title,
-				text: $scope.text,
-				country: 'it',
-				language: 'en'
+				text: $scope.text
 			});
 			// Reset form
 			$scope.title = '';
@@ -72,8 +70,41 @@ angular.module('board').controller('ThreadCtrl', [
 	function ($scope, threads, thread) {
 
 		$scope.thread = thread;
+		$scope.threadForm = false;
+		$scope.title = thread.title;
+		$scope.text = thread.text;
 		$scope.comText = {};
 		$scope.commentForm = {};
+
+		// Show edit thread form
+		$scope.showThreadForm = function() {
+			$scope.threadForm = true;
+		};
+
+		// Hide edit thread form
+		$scope.hideThreadForm = function() {
+			$scope.title = $scope.thread.title;
+			$scope.text = $scope.thread.text;
+			$scope.threadForm = false;
+		};
+
+		// Edit thread
+		$scope.editThread = function() {
+			// Edit only threads if non-empty data is given
+			if ($scope.title === '' || $scope.text === '') {
+				return;
+			}
+			threads.editThread(thread._id, {
+				title: $scope.title,
+				text: $scope.text
+			}).success(function (data) {
+				$scope.thread.title = data.title;
+				$scope.thread.text = data.text;
+				$scope.thread.updated = data.updated;
+			});
+			// Reset and hide form when done
+			$scope.hideThreadForm();
+		};
 
 		// Show comment form
 		$scope.showCommentForm = function(messageid) {

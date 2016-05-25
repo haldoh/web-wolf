@@ -35,6 +35,14 @@ angular.module('threads', []).factory('threads', [
 				o.threads[data._id] = data;
 			});
 		};
+		// Edit a thread
+		o.editThread = function (threadid, thread) {
+			return $http.put('/threads/' + threadid, thread).success(function (data) {
+				o.threads[data._id].title = data.title;
+				o.threads[data._id].text = data.text;
+				o.threads[data._id].updated = data.updated;
+			});
+		};
 		// Upvote thread - called from list page
 		o.upvoteThreadId = function (threadid) {
 			return $http.put('/threads/' + threadid + '/vote')

@@ -89,6 +89,27 @@ module.exports.new = function (req, res, next) {
 	});
 };
 
+module.exports.edit = function (req, res, next) {
+	var url = config.board.endpoint + '/board/' + req.params.threadid;
+	var options = getAuthOptions(req);
+	options.url = url;
+	options.method = 'PUT';
+	options.form = req.body;
+	return request(options, function (err, resp, body) {
+		if (err)
+			return res.status(500).send('Error from board layer: ' + err);
+		else {
+			var bodyObj = null;
+			try {
+				bodyObj = JSON.parse(body);
+			} catch (e) {
+				return res.status(500).send('Error parsing response - not JSON: ' + body);
+			}
+			return res.status(resp.statusCode).send(bodyObj);
+		}
+	});
+};
+
 module.exports.upvoteThread = function (req, res, next) {
 	var url = config.board.endpoint + '/board/' + req.params.threadid + '/vote';
 	var options = getAuthOptions(req);

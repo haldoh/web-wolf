@@ -49,7 +49,10 @@ block content
 	script(type="text/ng-template" id="/thread.html")
 		.row
 			.col-md-12
-				h3 {{ thread.title }}
+				h3(ng-hide="threadForm") {{ thread.title }}
+				form.form-inline(ng-show="threadForm")
+					.form-group
+						input.form-control(type="text", name="title", id="title", ng-model="title")
 		.row.thread-box
 			.row
 				.col-md-1.text-center.votes-box
@@ -60,13 +63,20 @@ block content
 							span.glyphicon.glyphicon-chevron-down.red.vote-button(ng-class="{off: thread.voted !== -1, on: thread.voted === -1}", ng-click="downvote()")
 						p.thread-votes (+{{ thread.upvotes }}/-{{ thread.downvotes }})
 				.col-md-11.thread-content-box
-					p.thread-text {{ thread.text }}
+					p.thread-text(ng-hide="threadForm") {{ thread.text }}
+					form.form-inline(ng-show="threadForm")
+						.form-group
+							input.form-control(type="text", name="text", id="text", ng-model="text")
+							button.btn.btn-primary(ng-click="editThread()") Edit
+							button.btn.btn-default(ng-click="hideThreadForm()") Cancel
 			.row
 				.col-md-1
 				.col-md-11
 					p.thread-details {{ thread.author.displayName }}
 						|  - {{ thread.time | date:'dd/MM/yyyy HH:mm:ss' }}
-						span(ng-show="thread.owned")  - Edit - Delete
+						span(ng-show="thread.owned")  - 
+							span.active-text(ng-click="showThreadForm()") Edit
+							|  - Delete
 		.row
 			.col-md-12
 				h4
