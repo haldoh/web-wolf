@@ -97,6 +97,10 @@ a:hover {
 	color: red
 }
 
+.title-edit-form {
+	margin: 10px;
+}
+
 .thread-list-content {
 	float: left;
 }

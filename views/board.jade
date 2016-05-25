@@ -50,7 +50,7 @@ block content
 		.row
 			.col-md-12
 				h3(ng-hide="threadForm") {{ thread.title }}
-				form.form-inline(ng-show="threadForm")
+				form.title-edit-form(ng-show="threadForm")
 					.form-group
 						input.form-control(type="text", name="title", id="title", ng-model="title")
 		.row.thread-box
@@ -64,11 +64,11 @@ block content
 						p.thread-votes (+{{ thread.upvotes }}/-{{ thread.downvotes }})
 				.col-md-11.thread-content-box
 					p.thread-text(ng-hide="threadForm") {{ thread.text }}
-					form.form-inline(ng-show="threadForm")
+					form(ng-show="threadForm")
 						.form-group
-							input.form-control(type="text", name="text", id="text", ng-model="text")
-							button.btn.btn-primary(ng-click="editThread()") Edit
-							button.btn.btn-default(ng-click="hideThreadForm()") Cancel
+							textarea.form-control(form="threadForm", name="text", id="text", ng-model="text")
+						button.btn.btn-primary(ng-click="editThread()") Edit
+						button.btn.btn-default(ng-click="hideThreadForm()") Cancel
 			.row
 				.col-md-1
 				.col-md-11
