@@ -4,18 +4,37 @@ block content
 	.container
 		.starter-template
 			h1 web-wolf
-			p.lead Web server for Wolf's applications.
-			if (!user)
-				p
-					a(href='/Login')
-						button.btn.btn-default.btn-fixed.add-btn(type="button") Login
-				p
-					a(href='/signup')
-						button.btn.btn-default.btn-fixed.add-btn(type="button") Signup
-				p or
-				p
-					a(href='/auth/facebook')
-						button.btn.btn-default.btn-fixed.add-btn(type="button") Login with Facebook
-				p
-					a(href='/auth/twitter')
-						button.btn.btn-default.btn-fixed.dd-btn(type="button") Login with Twitter
+				p.lead Web server for Wolf's applications.
+		.starter-template
+			.row
+				.col-md-6
+					if (!user)
+						p
+							a(href='/Login')
+								button.btn.btn-default.btn-fixed.add-btn(type="button") Login
+						p
+							a(href='/signup')
+								button.btn.btn-default.btn-fixed.add-btn(type="button") Signup
+						p or
+						p
+							a(href='/auth/facebook')
+								button.btn.btn-default.btn-fixed.add-btn(type="button") Login with Facebook
+						p
+							a(href='/auth/twitter')
+								button.btn.btn-default.btn-fixed.dd-btn(type="button") Login with Twitter
+					else
+						p.lead Welcome #{ user.displayName }!
+				.col-md-6
+					p.lead Services status
+						p#auth-test Authentication service 
+							span#auth-status.service-status
+							img#auth-loading.service-loading(src='images/black-broken-circle-loading.gif')
+						p#board-test Message board service 
+							span#board-status.service-status
+							img#board-loading.service-loading(src='images/black-broken-circle-loading.gif')
+						p#voip-test VoIP call service 
+							span#voip-status.service-status
+							img#voip-loading.service-loading(src='images/black-broken-circle-loading.gif')
+
+block bottomscripts
+	script(type='text/javascript' src='/javascripts/index-services.js')

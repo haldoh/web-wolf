@@ -92,6 +92,8 @@ module.exports = function () {
 	app.use('/auth', require('../routes/auth'));
 	// Threads routes
 	app.use('/threads', require('../routes/threads'));
+	// Test services routes
+	app.use('/services', require('../routes/services'));
 
 	/*
 	 * HTTP server setup

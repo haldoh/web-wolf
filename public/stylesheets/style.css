@@ -1,16 +1,26 @@
 body {
-  padding: 50px;
+  padding: 40px;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
 .starter-template {
-	padding: 40px 15px;
+	padding: 20px 10px;
 	text-align: center;
 }
 
 .navbar-inverse .navbar-nav > li > a {
 	color: #FF5300;
 	text-decoration: none;
+}
+
+.service-loading {
+	height: 20px;
+	width: 20px;
+}
+
+.service-status {
+	height: 20px;
+	width: 20px;
 }
 
 #brand {
