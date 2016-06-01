@@ -40,12 +40,22 @@ angular.module('board').controller('BoardCtrl', [
 			threads.newThread({
 				title: $scope.title,
 				text: $scope.text
+			}).success(function (data) {
+
+				// Reset form
+				$scope.title = '';
+				$scope.text = '';
+				$scope.hideForm();
+				$scope.noThreads = false;
 			});
-			// Reset form
-			$scope.title = '';
-			$scope.text = '';
-			$scope.hideForm();
-			$scope.noThreads = false;
+		};
+
+		// Delete thread
+		$scope.deleteThread = function (threadid) {
+			if ($scope.threads[threadid].owned && $scope.threads[threadid].messagesNumber === 0)
+				threads.deleteThread(threadid).success(function () {
+					delete $scope.threads[threadid];
+				});
 		};
 
 		// Upvote thread
@@ -65,16 +75,28 @@ angular.module('board').controller('BoardCtrl', [
 // Controller for single thread page
 angular.module('board').controller('ThreadCtrl', [
 	'$scope',
-	'threads',
 	'thread',
-	function ($scope, threads, thread) {
+	function ($scope, thread) {
 
-		$scope.thread = thread;
+		// Main thread object
+		$scope.thread = thread.thread;
+
+		// Thread edit form
 		$scope.threadForm = false;
-		$scope.title = thread.title;
-		$scope.text = thread.text;
+		$scope.title = thread.thread.title;
+		$scope.text = thread.thread.text;
+		
+		// New comment form
 		$scope.comText = {};
 		$scope.commentForm = {};
+
+		// Edit message form
+		$scope.editMsgText = {};
+		$scope.editMessageForm = {};
+
+		// Edit comment form
+		$scope.editComText = {};
+		$scope.editCommentForm = {};
 
 		// Show edit thread form
 		$scope.showThreadForm = function() {
@@ -88,103 +110,150 @@ angular.module('board').controller('ThreadCtrl', [
 			$scope.threadForm = false;
 		};
 
-		// Edit thread
-		$scope.editThread = function() {
-			// Edit only threads if non-empty data is given
-			if ($scope.title === '' || $scope.text === '') {
-				return;
-			}
-			threads.editThread(thread._id, {
-				title: $scope.title,
-				text: $scope.text
-			}).success(function (data) {
-				$scope.thread.title = data.title;
-				$scope.thread.text = data.text;
-				$scope.thread.updated = data.updated;
-			});
-			// Reset and hide form when done
-			$scope.hideThreadForm();
-		};
-
 		// Show comment form
-		$scope.showCommentForm = function(messageid) {
-			$scope.commentForm[messageid] = true;
+		$scope.showCommentForm = function(message) {
+			$scope.commentForm[message._id] = true;
 		};
 
 		// Hide comment form
-		$scope.hideCommentForm = function(messageid) {
-			$scope.commentForm[messageid] = false;
+		$scope.hideCommentForm = function(message) {
+			$scope.commentForm[message._id] = false;
+		};
+
+		// Show edit message form
+		$scope.showEditMessageForm = function(message) {
+			$scope.editMsgText[message._id] = message.text;
+			$scope.editMessageForm[message._id] = true;
+		};
+
+		// Hide edit message form
+		$scope.hideEditMessageForm = function(message) {
+			$scope.editMsgText[message._id] = message.text;
+			$scope.editMessageForm[message._id] = false;
+		};
+
+		// Show edit comment form
+		$scope.showEditCommentForm = function(message, comment) {
+			$scope.editComText[message._id + comment._id] = comment.text;
+			$scope.editCommentForm[message._id + comment._id] = true;
+		};
+
+		// Hide edit comment form
+		$scope.hideEditCommentForm = function(message, comment) {
+			$scope.editComText[message._id + comment._id] = comment.text;
+			$scope.editCommentForm[message._id + comment._id] = false;
+		};
+
+		// Edit thread
+		$scope.editThread = function() {
+			// Edit only threads if non-empty data is given
+			if ($scope.title !== '' && $scope.text !== '')
+				thread.edit({
+					title: $scope.title,
+					text: $scope.text
+				}).success(function (data) {
+					// Reset and hide form when done
+					$scope.hideThreadForm();
+				});
+		};
+
+		// Upvote thread
+		$scope.upvote = function () {
+			if ($scope.thread.voted !== 1)
+				thread.upvote();
+		};
+
+		// Downvote thread
+		$scope.downvote = function () {
+			if ($scope.thread.voted !== -1)
+				thread.downvote();
 		};
 
 		// Send a new message
 		$scope.sendMessage = function () {
 			// Send only non-empty messages
-			if ($scope.msgText === '') {
-				return;
-			}
-			threads.sendMessage(thread._id, {
-				text: $scope.msgText
-			}).success(function (data) {
-				// Update this thread
-				$scope.thread.messages.push(data);
-			});
-			// Reset form
-			$scope.msgText = '';
+			if ($scope.msgText !== '')
+				thread.sendMessage({
+					text: $scope.msgText
+				}).success(function (data) {
+					// Reset form when done
+					$scope.msgText = '';
+				});
+		};
+
+		// Edit a message
+		$scope.editMessage = function (message) {
+			// Edit message only if non-empty data is given
+			if ($scope.editMsgText[message._id] !== '')
+				thread.editMessage(message, {
+					text: $scope.editMsgText[message._id]
+				}).success(function (data) {
+					// Reset and hide form when done
+					$scope.hideEditMessageForm(message);
+				});
+		};
+
+		// Delete message
+		$scope.deleteMessage = function (message) {
+			if (message.owned && message.commentsNumber === 0)
+				thread.deleteMessage(message);
+		};
+
+		// Upvote message
+		$scope.upvoteMessage = function (message) {
+			if (message.voted !== 1)
+				thread.upvoteMessage(message);
+		};
+
+		// Downvote message
+		$scope.downvoteMessage = function (message) {
+			if (message.voted !== -1)
+				thread.downvoteMessage(message);
 		};
 
 		// Send a new comment
 		$scope.sendComment = function (message) {
 
 			// Send only non-empty messages
-			if ($scope.comText[message._id] === '') {
-				return;
-			}
-			threads.sendComment(thread._id, message._id, {
-				text: $scope.comText[message._id]
-			}).success(function (data) {
-				// Update this thread
-				message.comments.push(data);
-			});
-			// Reset form
-			$scope.comText[message._id] = '';
-			// Hide form
-			$scope.commentForm[message._id] = false;
+			if ($scope.comText[message._id] !== '')
+				thread.sendComment(message, {
+					text: $scope.comText[message._id]
+				}).success(function (data) {
+					// Reset form
+					$scope.comText[message._id] = '';
+					// Hide form
+					$scope.commentForm[message._id] = false;
+				});
 		};
 
-		// Upvote thread
-		$scope.upvote = function () {
-			if ($scope.thread.voted !== 1)
-				threads.upvoteThread($scope.thread);
+		// Edit a comment
+		$scope.editComment = function (message, comment) {
+			// Edit message only if non-empty data is given
+			if ($scope.editComText[message._id + comment._id] !== '')
+				thread.editComment(message, comment, {
+					text: $scope.editComText[message._id + comment._id]
+				}).success(function (data) {
+					// Reset and hide form when done
+					$scope.hideEditCommentForm(message, comment);
+				});
 		};
 
-		// Downvote thread
-		$scope.downvote = function () {
-			if ($scope.thread.voted !== -1)
-				threads.downvoteThread($scope.thread);
-		};
-
-		// Upvote message
-		$scope.upvoteMessage = function (message) {
-			if (message.voted !== 1)
-				threads.upvoteMessage($scope.thread._id, message);
-		};
-
-		// Downvote thread
-		$scope.downvoteMessage = function (message) {
-			if (message.voted !== -1)
-				threads.downvoteMessage($scope.thread._id, message);
+		// Delete comment
+		$scope.deleteComment = function (message, comment) {
+			if (comment.owned)
+				thread.deleteComment(message, comment);
 		};
 
 		// Upvote comment
 		$scope.upvoteComment = function (messageid, comment) {
 			if (comment.voted !== 1)
-				threads.upvoteComment($scope.thread._id, messageid, comment);
+				thread.upvoteComment(messageid, comment);
 		};
 
 		// Downvote comment
 		$scope.downvoteComment = function (messageid, comment) {
 			if (comment.voted !== -1)
-				threads.downvoteComment($scope.thread._id, messageid, comment);
+				thread.downvoteComment(messageid, comment);
 		};
 	}
 ]);

@@ -43,7 +43,9 @@ block content
 					ng-pluralize(count="thread.messagesNumber" when="{'1': '1 message', 'other': '{{ thread.messagesNumber }} messages'}")
 					|  - 
 					ng-pluralize(count="thread.commentsNumber" when="{'1': '1 comment', 'other': '{{ thread.commentsNumber }} comments'}")
-					|  - last update: {{ thread.time | date:'dd/MM/yyyy HH:mm:ss' }}
+					|  - last update: {{ thread.updated | date:'dd/MM/yyyy HH:mm:ss' }}
+					span(ng-show="thread.owned && thread.messagesNumber === 0")  - 
+						span.active-text(ng-click="deleteThread(thread._id)") Delete
 
 	// thread.html - single thread page
 	script(type="text/ng-template" id="/thread.html")
@@ -76,7 +78,6 @@ block content
 						|  - {{ thread.time | date:'dd/MM/yyyy HH:mm:ss' }}
 						span(ng-show="thread.owned")  - 
 							span.active-text(ng-click="showThreadForm()") Edit
-							|  - Delete
 		.row
 			.col-md-12
 				h4
@@ -92,13 +93,21 @@ block content
 								span.glyphicon.glyphicon-chevron-down.red.vote-button(ng-class="{off: message.voted !== -1, on: message.voted === -1}", ng-click="downvoteMessage(message)")
 							p.message-votes (+{{ message.upvotes }}/-{{ message.downvotes }})
 					.col-md-11
-						p.thread-text {{ message.text }}
+						p(ng-hide="editMessageForm[message._id]").thread-text {{ message.text }}
+						form.msg-edit-form(ng-show="editMessageForm[message._id]")
+							.form-group
+								textarea.form-control(form="threadForm", name="editMsgText", id="editMsgText", ng-model="editMsgText[message._id]")
+							button.btn.btn-primary(ng-click="editMessage(message)") Edit
+							button.btn.btn-default(ng-click="hideEditMessageForm(message)") Cancel
 				.row
 					.col-md-1
 					.col-md-11
 						p.thread-details {{ message.author.displayName }} - 
 							| {{ message.time | date:'dd/MM/yyyy HH:mm:ss' }}
-							span(ng-show="message.owned")  - Edit - Delete
+							span(ng-show="message.owned && message.commentsNumber === 0")  -
+								span.active-text(ng-click="showEditMessageForm(message)")  Edit
+								|  - 
+								span.active-text(ng-click="deleteMessage(message)")  Delete
 			.msg-cont(ng-repeat="comment in message.comments")
 				.row
 					.col-md-1
@@ -113,25 +122,33 @@ block content
 											span.glyphicon.glyphicon-chevron-down.red.vote-button(ng-class="{off: comment.voted !== -1, on: comment.voted === -1}", ng-click="downvoteComment(message._id, comment)")
 										p.comment-votes (+{{ comment.upvotes }}/-{{ comment.downvotes }})
 								.col-md-11
-									p.thread-text {{ comment.text }}
+									p(ng-hide="editCommentForm[message._id + comment._id]").thread-text {{ comment.text }}
+									form.msg-edit-form(ng-show="editCommentForm[message._id + comment._id]")
+										.form-group
+											textarea.form-control(form="threadForm", name="editcomText", id="editComText", ng-model="editComText[message._id + comment._id]")
+										button.btn.btn-primary(ng-click="editComment(message, comment)") Edit
+										button.btn.btn-default(ng-click="hideEditCommentForm(message, comment)") Cancel
 							.row
 								.col-md-1
 								.col-md-11
 									p.thread-details {{ comment.author.displayName }} - 
 										| {{ comment.time | date:'dd/MM/yyyy HH:mm:ss' }}
-										span(ng-show="comment.owned")  - Edit - Delete
+										span(ng-show="comment.owned")  -
+											span.active-text(ng-click="showEditCommentForm(message, comment)")  Edit
+											|  - 
+											span.active-text(ng-click="deleteComment(message, comment)")  Delete
 			.row
 				.col-md-1
 				.col-md-1
 				.col-md-10
-					a.comment-form-link(ng-hide="commentForm[message._id]", ng-click="showCommentForm(message._id)")
+					a.comment-form-link(ng-hide="commentForm[message._id]", ng-click="showCommentForm(message)")
 						| Add a comment
 					form.form-inline(ng-show="commentForm[message._id]" ng-submit="sendComment(message)")
 						.form-group
 							label.sr-only(for="comText") Comment
 							input.form-control(type="text", name="comText", id="comText", ng-model="comText[message._id]", placeholder="Comment this message...")
 							button.btn.btn-primary(type="submit") Send
-							button.btn.btn-default(ng-click="hideCommentForm(message._id)") Cancel
+							button.btn.btn-default(ng-click="hideCommentForm(message)") Cancel
 		.row
 			.row.thread-box
 				.col-md-12.new-message

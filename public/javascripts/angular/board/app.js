@@ -13,7 +13,7 @@
 
 // App name and initialization
 var mainAppModuleName = 'board';
-var app = angular.module(mainAppModuleName, ['ui.router', 'threads']);
+var app = angular.module(mainAppModuleName, ['ui.router', 'threads', 'thread']);
 
 // Hashbangs
 app.config(['$locationProvider', function ($locationProvider) {
@@ -50,8 +50,8 @@ app.config([
 				templateUrl: '/thread.html',
 				controller: 'ThreadCtrl',
 				resolve: {
-					thread: ['$stateParams', 'threads', function ($stateParams, threads) {
-						return threads.getThread($stateParams.id);
+					threadPromise: ['$stateParams', 'thread', function ($stateParams, thread) {
+						return thread.get($stateParams.id);
 					}]
 				}
 			});

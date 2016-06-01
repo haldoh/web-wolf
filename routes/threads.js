@@ -18,8 +18,10 @@ router.route('/:threadid')
 	.get(auth.isAuthenticated, threads.get)
 	// POST - post a message to this thread
 	.post(auth.isAuthenticated, threads.newMessage)
-	// PUT - post a message to this thread
-	.put(auth.isAuthenticated, threads.edit);
+	// PUT - edit this thread
+	.put(auth.isAuthenticated, threads.edit)
+	// DELETE - delete this thread
+	.delete(auth.isAuthenticated, threads.delete);
 
 router.route('/:threadid/vote')
 	// PUT - upvote a thread
@@ -29,13 +31,23 @@ router.route('/:threadid/vote')
 
 router.route('/:threadid/:messageid')
 	// POST - post a comment to a message
-	.post(auth.isAuthenticated, threads.newComment);
+	.post(auth.isAuthenticated, threads.newComment)
+	// PUT - edit this message
+	.put(auth.isAuthenticated, threads.editMessage)
+	// DELETE - delete this message
+	.delete(auth.isAuthenticated, threads.deleteMessage);
 
 router.route('/:threadid/:messageid/vote')
 	// PUT - upvote a thread
 	.put(auth.isAuthenticated, threads.upvoteMessage)
 	// DELETE - downvote a thread
 	.delete(auth.isAuthenticated, threads.downvoteMessage);
+
+router.route('/:threadid/:messageid/:commentid')
+	// PUT - edit this comment
+	.put(auth.isAuthenticated, threads.editComment)
+	// DELETE - delete this comment
+	.delete(auth.isAuthenticated, threads.deleteComment);
 
 router.route('/:threadid/:messageid/:commentid/vote')
 	// PUT - upvote a thread
