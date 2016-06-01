@@ -104,10 +104,10 @@ block content
 					.col-md-11
 						p.thread-details {{ message.author.displayName }} - 
 							| {{ message.time | date:'dd/MM/yyyy HH:mm:ss' }}
-							span(ng-show="message.owned && message.commentsNumber === 0")  -
+							span(ng-show="message.owned")  -
 								span.active-text(ng-click="showEditMessageForm(message)")  Edit
-								|  - 
-								span.active-text(ng-click="deleteMessage(message)")  Delete
+								span(ng-show="message.commentsNumber === 0")  -
+									span.active-text(ng-click="deleteMessage(message)")  Delete
 			.msg-cont(ng-repeat="comment in message.comments")
 				.row
 					.col-md-1
