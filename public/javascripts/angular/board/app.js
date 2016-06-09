@@ -13,7 +13,7 @@
 
 // App name and initialization
 var mainAppModuleName = 'board';
-var app = angular.module(mainAppModuleName, ['ui.router', 'threads', 'thread']);
+var app = angular.module(mainAppModuleName, ['ui.router', 'categories', 'threads', 'thread']);
 
 // Hashbangs
 app.config(['$locationProvider', function ($locationProvider) {

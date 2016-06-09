@@ -10,51 +10,130 @@
 /*global angular*/
 "use strict";
 
+// Categories service
+angular.module('categories', []).factory('categories', [
+	function () {
+
+		var o = {
+			categories: {
+				'lifestyle': {
+					visible: true,
+					collapsed: true
+				},
+				'politics': {
+					visible: true,
+					collapsed: true
+				},
+				'proposals': {
+					visible: true,
+					collapsed: true
+				}
+			}
+		};
+
+		// Get a list of categories
+		o.getCategories = function () {
+			return Object.keys(o.categories);
+		};
+
+		// Check if a given category is visible
+		o.visible = function (category) {
+			return o.categories[category] && o.categories[category].visible;
+		};
+
+		// Make a category visible
+		o.show = function (category) {
+			if (o.categories[category]) {
+				o.categories[category].visible = true;
+				return true;
+			} else
+				return false;
+		};
+
+		// Make a category not visible
+		o.hide = function (category) {
+			if (o.categories[category]) {
+				o.categories[category].visible = false;
+				return true;
+			} else
+				return false;
+		};
+
+		// Check if a given category is collapsed
+		o.collapsed = function (category) {
+			return o.categories[category] && o.categories[category].collapsed;
+		};
+
+		// Make a category collapsed
+		o.collapse = function (category) {
+			if (o.categories[category]) {
+				o.categories[category].collapsed = true;
+				return true;
+			} else
+				return false;
+		};
+
+		// Make a category not collapsed
+		o.uncollapse = function (category) {
+			if (o.categories[category]) {
+				o.categories[category].collapsed = false;
+				return true;
+			} else
+				return false;
+		};
+
+		return o;
+	}
+]);
+
 // Threads service
 angular.module('threads', []).factory('threads', [
 	'$http',
 	function ($http) {
 		
 		var o = {
-			threads: {}
+			threads: []
 		};
 
 		// Method to list all threads
 		o.getAll = function () {
 			return $http.get('/threads').success(function (data) {
-				angular.copy(data.threads, o.threads);
+				// angular.copy(data.threads, o.threads);
+				o.threads = data.threads;
 			});
 		};
 		
 		// Create a new thread
 		o.newThread = function (thread) {
 			return $http.post('/threads', thread).success(function (data) {
-				o.threads[data._id] = data;
+				o.threads.push(data);
 			});
 		};
 		
 		// Delete a thread
-		o.deleteThread = function (threadid) {
-			return $http.delete('/threads/' + threadid).success(function (data) {
-				delete o.threads[threadid];
+		o.deleteThread = function (thread) {
+			return $http.delete('/threads/' + thread._id).success(function (data) {
+				for (var i = 0; i < o.threads.length; i += 1)
+					if (o.threads[i]._id === thread._id)
+						o.threads.splice(i, 1);
 			});
 		};
 		// Upvote thread - called from list page
-		o.upvoteThreadId = function (threadid) {
-			return $http.put('/threads/' + threadid + '/vote')
+		o.upvoteThread = function (thread) {
+			return $http.put('/threads/' + thread._id + '/vote')
 				.success(function (data) {
-					o.threads[threadid].upvotes = data.upvotes;
-					o.threads[threadid].downvotes = data.downvotes;
-					o.threads[threadid].voted = data.voted;
+					thread.upvotes = data.upvotes;
+					thread.downvotes = data.downvotes;
+					thread.voted = data.voted;
 				});
 		};
 		// Downvote thread - called from list page
-		o.downvoteThreadId = function (threadid) {
-			return $http.delete('/threads/' + threadid + '/vote')
+		o.downvoteThread = function (thread) {
+			return $http.delete('/threads/' + thread._id + '/vote')
 				.success(function (data) {
-					o.threads[threadid].upvotes = data.upvotes;
-					o.threads[threadid].downvotes = data.downvotes;
-					o.threads[threadid].voted = data.voted;
+					thread.upvotes = data.upvotes;
+					thread.downvotes = data.downvotes;
+					thread.voted = data.voted;
 				});
 		};
 		

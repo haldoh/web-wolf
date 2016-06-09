@@ -8,6 +8,31 @@ body {
 	text-align: center;
 }
 
+.top-thread-form {
+	margin: 10px;
+}
+
+.collapse-icon {
+	margin-right: 5px;
+	color: #FF5300;
+	cursor: pointer;
+	font-size: large;
+}
+
+.thread-row {
+	padding: 5px;
+	padding-left: 15px;
+}
+
+.category-title {
+    text-transform: capitalize;
+    display: inline-block;
+}
+
+.thread-title-edit {
+	margin-top: 25px;
+}
+
 .navbar-inverse .navbar-nav > li > a {
 	color: #FF5300;
 	text-decoration: none;
@@ -99,12 +124,17 @@ a:hover {
 	opacity: 0.8;
 }
 
+.top-icon {
+	margin-right: 5px;
+	color: #FF5300;
+}
+
 .green {
-	color: green
+	color: green;
 }
 
 .red {
-	color: red
+	color: red;
 }
 
 .title-edit-form {
@@ -113,6 +143,11 @@ a:hover {
 
 .thread-list-content {
 	float: left;
+}
+
+.category-text {
+	font-size: small;
+	text-transform: capitalize;
 }
 
 .author-text {

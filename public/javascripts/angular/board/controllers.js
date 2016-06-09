@@ -14,11 +14,17 @@
 angular.module('board').controller('BoardCtrl', [
 	'$scope',
 	'threads',
-	function ($scope, threads) {
+	'categories',
+	function ($scope, threads, categories) {
 
+		// Categories
+		$scope.categories = categories.getCategories();
+
+		// Get threads from service
 		$scope.threads = threads.threads;
 
-		$scope.noThreads = (Object.keys($scope.threads).length > 0 ? false : true);
+		// check if there are threads to display
+		$scope.noThreads = ($scope.threads.length > 0 ? false : true);
 
 		// Hide/show new thread form
 		$scope.threadForm = false;
@@ -28,46 +34,62 @@ angular.module('board').controller('BoardCtrl', [
 		$scope.hideForm = function () {
 			$scope.title = '';
 			$scope.text = '';
+			$scope.category = '';
+			$scope.top = 0;
 			$scope.threadForm = false;
+			$scope.noThreads = (Object.keys($scope.threads).length > 0 ? false : true);
+		};
+
+		// Check if a category is collapsed
+		$scope.collapsedCategory = function (category) {
+			return categories.collapsed(category);
+		};
+
+		// Collapse a category
+		$scope.collapseCategory = function (category) {
+			return categories.collapse(category);
+		};
+
+		// uncollapse a category
+		$scope.uncollapseCategory = function (category) {
+			return categories.uncollapse(category);
 		};
 
 		// Create a new thread
 		$scope.newThread = function () {
+			console.log($scope.top);
 			// Create only threads with non-empty data
 			if ($scope.title === '' || $scope.text === '') {
 				return;
 			}
 			threads.newThread({
 				title: $scope.title,
-				text: $scope.text
+				text: $scope.text,
+				category: $scope.category,
+				top: $scope.top ? $scope.top : false
 			}).success(function (data) {
 
-				// Reset form
-				$scope.title = '';
-				$scope.text = '';
+				// Hide form
 				$scope.hideForm();
-				$scope.noThreads = false;
 			});
 		};
 
 		// Delete thread
-		$scope.deleteThread = function (threadid) {
-			if ($scope.threads[threadid].owned && $scope.threads[threadid].messagesNumber === 0)
-				threads.deleteThread(threadid).success(function () {
-					delete $scope.threads[threadid];
-				});
+		$scope.deleteThread = function (thread) {
+			if (thread.owned && thread.messagesNumber === 0)
+				threads.deleteThread(thread);
 		};
 
 		// Upvote thread
-		$scope.upvote = function (threadid) {
-			if ($scope.threads[threadid].voted !== 1)
-				threads.upvoteThreadId(threadid);
+		$scope.upvote = function (thread) {
+			if (thread.voted !== 1)
+				threads.upvoteThread(thread);
 		};
 
 		// Downvote thread
-		$scope.downvote = function (threadid) {
-			if ($scope.threads[threadid].voted !== -1)
-				threads.downvoteThreadId(threadid);
+		$scope.downvote = function (thread) {
+			if (thread.voted !== -1)
+				threads.downvoteThread(thread);
 		};
 	}
 ]);

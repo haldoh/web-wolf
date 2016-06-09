@@ -15,37 +15,56 @@ block content
 			.col-md-12
 				h2 wolf board test platform
 				button.btn.btn-primary(ng-hide="threadForm", ng-click="showForm()") Start a new thread
+		.row.top-thread-form
+			.col-md-12
 				form(ng-show="threadForm", ng-submit="newThread()", id="newThreadForm")
 					.form-group
-						label.sr-only(for="title") Title
-						input.form-control(type="text", name="title", id="title", ng-model="title", placeholder="Title of your new thread")
+						label(for="title") Title
+						input.form-control(type="text", name="title", id="title", ng-model="title", placeholder="Title of your new board message")
 					.form-group
-						label.sr-only(for="text") Text
-						textarea.form-control(form="newThreadForm", name="text", id="text", ng-model="text", placeholder="Write text here")
+						label(for="text") Text
+						textarea.form-control(form="newThreadForm", name="text", id="text", ng-model="text", placeholder="Write your message here")
+					.form-group
+						label(for="category") Category
+						select.form-control(id="category", name="category", ng-model="category")
+							option Politics
+							option Proposals
+							option Lifestyle
+					.checkbox
+						label(for="top")
+							input(type="checkbox" name="top", id="top", ng-model="top")
+							| Top
 					button.btn.btn-primary(type="submit") Create
 					button.btn.btn-default(ng-show="threadForm", ng-click="hideForm()") Cancel
 		.row(ng-show="noThreads").text-center
 			p.lead No threads to show
-		.row(ng-repeat="thread in threads | orderBy:'-updated'")
-			.col-md-1.text-center.votes-box
-				p
-					h4
-						span.glyphicon.glyphicon-chevron-up.green.vote-button(ng-class="{off: thread.voted !== 1, on: thread.voted === 1}", ng-click="upvote(thread._id)")
-						| {{ thread.upvotes - thread.downvotes }}
-						span.glyphicon.glyphicon-chevron-down.red.vote-button(ng-class="{off: thread.voted !== -1, on: thread.voted === -1}", ng-click="downvote(thread._id)")
-					p.thread-votes (+{{ thread.upvotes }}/-{{ thread.downvotes }})
-			.col-md-11.thread-list-content
-				p
-					h4
-						a(href="#!/threads/{{ thread._id }}")
-							{{ thread.title }}
-						span.author-text  - {{ thread.author.displayName }}
-					ng-pluralize(count="thread.messagesNumber" when="{'1': '1 message', 'other': '{{ thread.messagesNumber }} messages'}")
-					|  - 
-					ng-pluralize(count="thread.commentsNumber" when="{'1': '1 comment', 'other': '{{ thread.commentsNumber }} comments'}")
-					|  - last update: {{ thread.updated | date:'dd/MM/yyyy HH:mm:ss' }}
-					span(ng-show="thread.owned && thread.messagesNumber === 0")  - 
-						span.active-text(ng-click="deleteThread(thread._id)") Delete
+		.row(ng-repeat="category in categories")
+			.col-md-12
+				span.glyphicon.glyphicon-chevron-right.collapse-icon(ng-show="collapsedCategory(category)", ng-click="uncollapseCategory(category)")
+				span.glyphicon.glyphicon-chevron-down.collapse-icon(ng-hide="collapsedCategory(category)", ng-click="collapseCategory(category)")
+				h3.category-title {{ category }}
+			.row.thread-row(ng-repeat="thread in threads | filter: { category: category } | orderBy:['category','-top','-updated']", ng-show="!collapsedCategory(category) || thread.top")
+				.col-md-1.text-center.votes-box
+					p
+						h4
+							span.glyphicon.glyphicon-chevron-up.green.vote-button(ng-class="{off: thread.voted !== 1, on: thread.voted === 1}", ng-click="upvote(thread)")
+							| {{ thread.upvotes - thread.downvotes }}
+							span.glyphicon.glyphicon-chevron-down.red.vote-button(ng-class="{off: thread.voted !== -1, on: thread.voted === -1}", ng-click="downvote(thread)")
+						p.thread-votes (+{{ thread.upvotes }}/-{{ thread.downvotes }})
+				.col-md-11.thread-list-content
+					p
+						h4
+							span.glyphicon.glyphicon-circle-arrow-up.top-icon(ng-show="thread.top")
+							a(href="#!/threads/{{ thread._id }}")
+								{{ thread.title }}
+							span.category-text  - in {{ thread.category }}
+							span.author-text  - {{ thread.author.displayName }}
+						ng-pluralize(count="thread.messagesNumber" when="{'1': '1 message', 'other': '{{ thread.messagesNumber }} messages'}")
+						|  - 
+						ng-pluralize(count="thread.commentsNumber" when="{'1': '1 comment', 'other': '{{ thread.commentsNumber }} comments'}")
+						|  - last update: {{ thread.updated | date:'dd/MM/yyyy HH:mm:ss' }}
+						span(ng-show="thread.owned && thread.messagesNumber === 0")  - 
+							span.active-text(ng-click="deleteThread(thread)") Delete
 
 	// thread.html - single thread page
 	script(type="text/ng-template" id="/thread.html")
@@ -53,7 +72,7 @@ block content
 			.col-md-12
 				h3(ng-hide="threadForm") {{ thread.title }}
 				form.title-edit-form(ng-show="threadForm")
-					.form-group
+					.form-group.thread-title-edit
 						input.form-control(type="text", name="title", id="title", ng-model="title")
 		.row.thread-box
 			.row
