@@ -72,11 +72,12 @@ angular.module('board').controller('BoardCtrl', [
 
 		// Create a new thread
 		$scope.newThread = function () {
-			console.log($scope.top);
+			
 			// Create only threads with non-empty data
-			if ($scope.title === '' || $scope.text === '') {
+			if ($scope.title === '' || $scope.text === '')
 				return;
-			}
+
+			// New thread
 			threads.newThread({
 				title: $scope.title,
 				text: $scope.text,
