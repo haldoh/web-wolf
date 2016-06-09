@@ -18,15 +18,18 @@ angular.module('categories', []).factory('categories', [
 			categories: {
 				'lifestyle': {
 					visible: true,
-					collapsed: true
+					collapsed: true,
+					threadNum: 0
 				},
 				'politics': {
 					visible: true,
-					collapsed: true
+					collapsed: true,
+					threadNum: 0
 				},
 				'proposals': {
 					visible: true,
-					collapsed: true
+					collapsed: true,
+					threadNum: 0
 				}
 			}
 		};
@@ -34,6 +37,39 @@ angular.module('categories', []).factory('categories', [
 		// Get a list of categories
 		o.getCategories = function () {
 			return Object.keys(o.categories);
+		};
+
+		// Parse threads informtaions for categories
+		o.parseThreads = function (threads) {
+			for (var i = 0; i < threads.length; i += 1)
+				if (o.categories[threads[i].category])
+					o.categories[threads[i].category].threadNum += 1;
+		};
+
+		// Get number of threads in a category (only after calling parseThreads)
+		o.getThreadNum = function (category) {
+			if (o.categories[category])
+				return o.categories[category].threadNum;
+			else
+				return 0;
+		};
+
+		// Increase threadNum for a given category
+		o.increaseThreadNum = function (category) {
+			if (o.categories[category]) {
+				o.categories[category].threadNum += 1;
+				return true;
+			} else
+				return false;
+		};
+
+		// Decrease threadNum for a given category
+		o.decreaseThreadNum = function (category) {
+			if (o.categories[category]) {
+				o.categories[category].threadNum -= 1;
+				return true;
+			} else
+				return false;
 		};
 
 		// Check if a given category is visible

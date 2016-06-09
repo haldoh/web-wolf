@@ -27,9 +27,8 @@ block content
 					.form-group
 						label(for="category") Category
 						select.form-control(id="category", name="category", ng-model="category")
-							option Politics
-							option Proposals
-							option Lifestyle
+							option.capitalize(ng-repeat="category in categories")
+								{{ category }}
 					.checkbox
 						label(for="top")
 							input(type="checkbox" name="top", id="top", ng-model="top")
@@ -38,10 +37,10 @@ block content
 					button.btn.btn-default(ng-show="threadForm", ng-click="hideForm()") Cancel
 		.row(ng-show="noThreads").text-center
 			p.lead No threads to show
-		.row(ng-repeat="category in categories")
+		.row(ng-repeat="category in categories | filter:filterEmptyCategories()")
 			.col-md-12
-				span.glyphicon.glyphicon-chevron-right.collapse-icon(ng-show="collapsedCategory(category)", ng-click="uncollapseCategory(category)")
-				span.glyphicon.glyphicon-chevron-down.collapse-icon(ng-hide="collapsedCategory(category)", ng-click="collapseCategory(category)")
+				span.glyphicon.glyphicon-chevron-right.collapse-icon(ng-show="collapsedCategory(category)", ng-class="{off: collapsedCategory(category), on: !collapsedCategory(category)}",ng-click="uncollapseCategory(category)")
+				span.glyphicon.glyphicon-chevron-down.collapse-icon.on(ng-hide="collapsedCategory(category)", ng-click="collapseCategory(category)")
 				h3.category-title {{ category }}
 			.row.thread-row(ng-repeat="thread in threads | filter: { category: category } | orderBy:['category','-top','-updated']", ng-show="!collapsedCategory(category) || thread.top")
 				.col-md-1.text-center.votes-box

@@ -19,6 +19,10 @@ body {
 	font-size: large;
 }
 
+.collapse-icon:hover {
+	opacity: 0.8;
+}
+
 .thread-row {
 	padding: 5px;
 	padding-left: 15px;
@@ -27,6 +31,10 @@ body {
 .category-title {
     text-transform: capitalize;
     display: inline-block;
+}
+
+.capitalize {
+	text-transform: capitalize;
 }
 
 .thread-title-edit {

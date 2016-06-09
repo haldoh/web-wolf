@@ -23,6 +23,9 @@ angular.module('board').controller('BoardCtrl', [
 		// Get threads from service
 		$scope.threads = threads.threads;
 
+		// Parse threads data for categories
+		categories.parseThreads($scope.threads);
+
 		// check if there are threads to display
 		$scope.noThreads = ($scope.threads.length > 0 ? false : true);
 
@@ -38,6 +41,18 @@ angular.module('board').controller('BoardCtrl', [
 			$scope.top = 0;
 			$scope.threadForm = false;
 			$scope.noThreads = (Object.keys($scope.threads).length > 0 ? false : true);
+		};
+
+		// Get category thread number
+		$scope.getCategoryThreadNumber = function (category) {
+			return categories.getThreadNum(category);
+		};
+
+		// Filter for categories with no threads
+		$scope.filterEmptyCategories = function () {
+			return function (category) {
+				return categories.getThreadNum(category) !== 0;
+			};
 		};
 
 		// Check if a category is collapsed
@@ -69,6 +84,8 @@ angular.module('board').controller('BoardCtrl', [
 				top: $scope.top ? $scope.top : false
 			}).success(function (data) {
 
+				// Increase category counter
+				categories.increaseThreadNum($scope.category);
 				// Hide form
 				$scope.hideForm();
 			});
@@ -77,7 +94,14 @@ angular.module('board').controller('BoardCtrl', [
 		// Delete thread
 		$scope.deleteThread = function (thread) {
 			if (thread.owned && thread.messagesNumber === 0)
-				threads.deleteThread(thread);
+				threads.deleteThread(thread)
+					.success(function (data) {
+
+						// Decrease category counter
+						categories.decreaseThreadNum(thread.category);
+						// Hide form
+						$scope.hideForm();
+					});
 		};
 
 		// Upvote thread
