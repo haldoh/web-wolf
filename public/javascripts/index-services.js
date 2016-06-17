@@ -42,3 +42,18 @@ $.get('/services/voip')
 		// Show failure
 		$('#voip-status').addClass('glyphicon glyphicon-remove');
 	});
+
+// Check chat service
+$.get('/services/chat')
+	.done(function () {
+		// Hide loading animation
+		$('#chat-loading').hide();
+		// Show success
+		$('#chat-status').addClass('glyphicon glyphicon-ok');
+	})
+	.fail(function () {
+		// Hide loading animation
+		$('#chat-loading').hide();
+		// Show failure
+		$('#chat-status').addClass('glyphicon glyphicon-remove');
+	});

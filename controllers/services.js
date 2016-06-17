@@ -34,7 +34,7 @@ module.exports.board = function (req, res, next) {
 	options.method = 'GET';
 	return request(options, function (err, resp, body) {
 		if (err)
-			return res.status(500).send('Error from auth layer: ' + err);
+			return res.status(500).send('Error from board layer: ' + err);
 		else
 			return res.status(resp.statusCode).send();
 	});
@@ -47,7 +47,20 @@ module.exports.voip = function (req, res, next) {
 	options.method = 'GET';
 	return request(options, function (err, resp, body) {
 		if (err)
-			return res.status(500).send('Error from auth layer: ' + err);
+			return res.status(500).send('Error from voip layer: ' + err);
+		else
+			return res.status(resp.statusCode).send();
+	});
+};
+
+module.exports.chat = function (req, res, next) {
+	var url = config.chat.endpoint;
+	var options = {};
+	options.url = url;
+	options.method = 'GET';
+	return request(options, function (err, resp, body) {
+		if (err)
+			return res.status(500).send('Error from chat layer: ' + err);
 		else
 			return res.status(resp.statusCode).send();
 	});
