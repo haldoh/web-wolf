@@ -97,6 +97,11 @@ var config = {
 			platform: process.env.PLATFORM,
 			token: process.env.BOARD_TOKEN
 		},
+		chat: {
+			endpoint: 'https://chat-wolf.herokuapp.com',
+			platform: process.env.PLATFORM,
+			token: process.env.CHAT_TOKEN
+		},
 		googleAuth: {
 			clientID: process.env.GOOGLE_CLIENT_ID,
 			clientSecret: process.env.GOOGLE_CLIENT_SECRET,
