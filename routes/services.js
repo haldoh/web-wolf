@@ -22,6 +22,10 @@ router.route('/board')
 	// GET - check board service
 	.get(services.board);
 
+router.route('/chat')
+	// GET - check chat service
+	.get(services.chat);
+
 router.route('/voip')
 	// GET - check voip service
 	.get(services.voip);
