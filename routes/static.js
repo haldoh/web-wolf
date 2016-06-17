@@ -25,8 +25,12 @@ router.route('/board')
 	.get(auth.isAuthenticated, render.board);
 
 router.route('/call')
-	// GET - render home page
+	// GET - render VoIP call page
 	.get(auth.isAuthenticated, render.voipCall);
+
+router.route('/chat')
+	// GET - render chat page
+	.get(auth.isAuthenticated, render.chat);
 
 router.route('/local_test')
 	// GET - render local user info

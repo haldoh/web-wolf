@@ -1,0 +1,15 @@
+extends layout-nav
+
+block content
+	.container
+		h2.text-center #{title}
+
+block bottomscripts
+	// socket.IO
+	script(type='text/javascript' src='#{chatEndpoint}/socket.io/socket.io.js')
+	// Define chat endpoint and token
+	script(type="text/javascript").
+		var chatEndpoint = '#{chatEndpoint}';
+		var chatToken = '#{chatToken}';
+	// Page logic
+	script(type='text/javascript' src='javascripts/chat.js')

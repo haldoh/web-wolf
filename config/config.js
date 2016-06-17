@@ -46,6 +46,11 @@ var config = {
 			platform: 'web-wolf',
 			token: 'localhost_web_token'
 		},
+		chat: {
+			endpoint: 'http://localhost:3300',
+			platform: 'web-wolf',
+			token: 'localhost_web_token'
+		},
 		googleAuth: {
 			clientID: 'process.env.GOOGLE_CLIENT_ID',
 			clientSecret: 'process.env.GOOGLE_CLIENT_SECRET',
