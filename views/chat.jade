@@ -2,14 +2,26 @@ extends layout-nav
 
 block content
 	.container
-		h2.text-center #{title}
+		.row
+			.col-md-12
+				h2.text-center #{title}
+		.row
+			.col-md-12
+				.form-group
+					label.sr-only(for="msgText") Message
+					input.form-control(type="text", name="msgText", id="msgText", placeholder="Write here...")
+					button.btn.btn-primary(id="sendMessage") Send
+		.row
+			.col-md-12
+				ul.message-list
 
 block bottomscripts
 	// socket.IO
 	script(type='text/javascript' src='#{chatEndpoint}/socket.io/socket.io.js')
-	// Define chat endpoint and token
+	// Define chat endpoint, token and room id
 	script(type="text/javascript").
 		var chatEndpoint = '#{chatEndpoint}';
 		var chatToken = '#{chatToken}';
+		var roomId = '#{roomId}';
 	// Page logic
-	script(type='text/javascript' src='javascripts/chat.js')
+	script(type='text/javascript' src='/javascripts/chat.js')

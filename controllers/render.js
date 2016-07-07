@@ -10,6 +10,8 @@
 "use strict";
 
 // Requires
+var uuid = require('node-uuid');
+
 var auth = require('../models/auth');
 var voip = require('../models/voip');
 var chat = require('../models/chat');
@@ -94,6 +96,58 @@ module.exports.board = function (req, res, next) {
 
 module.exports.chat = function (req, res, next) {
 
+	// Generate a random room ID
+	var roomId = uuid.v4();
+	roomId = roomId.replace(/-/g, '');
+
+	// Redirect to the chat room
+	res.redirect('chat/' + roomId);
+
+	// // Request temporary token from chat layer
+	// chat.getTempToken(req.user.token, function (err, resp, body) {
+
+	// 	// Error
+	// 	if (err) {
+	// 		logger.warn('Error while calling chat layer: ' + JSON.stringify(err));
+	// 		return res.status(500).send(err);
+	// 	}
+	// 	// Bad response from chat layer
+	// 	else if (resp.statusCode < 200 || resp.statusCode > 399) {
+	// 		logger.warn('Bad response from chat layer: ' + JSON.stringify(resp));
+	// 		return res.status(resp.statusCode).send(resp);
+	// 	}
+	// 	// OK - process data
+	// 	else {
+
+	// 		// Parse response body
+	// 		var bodyObj = {};
+	// 		try {
+	// 			bodyObj = JSON.parse(body);
+	// 		} catch (e) {
+
+	// 			// Log errors
+	// 			logger.warn('Error parsing response body for chat temp token - error: ' + e);
+	// 			logger.warn('Error parsing response body for chat temp token - body: ' + body);
+	// 		} finally {
+
+	// 			// Render page
+	// 			return res.render('chat', {
+	// 				title: 'Chat',
+	// 				user: req.user,
+	// 				chatEndpoint: config.chat.endpoint,
+	// 				chatToken: bodyObj.token,
+	// 				roomId: roomId
+	// 			});
+	// 		}
+	// 	}
+	// });
+};
+
+module.exports.chatRoom = function (req, res, next) {
+
+	// Get room ID
+	var roomId = req.params.roomId;
+
 	// Request temporary token from chat layer
 	chat.getTempToken(req.user.token, function (err, resp, body) {
 
@@ -102,7 +156,7 @@ module.exports.chat = function (req, res, next) {
 			logger.warn('Error while calling chat layer: ' + JSON.stringify(err));
 			return res.status(500).send(err);
 		}
-		// Bad response from voip layer
+		// Bad response from chat layer
 		else if (resp.statusCode < 200 || resp.statusCode > 399) {
 			logger.warn('Bad response from chat layer: ' + JSON.stringify(resp));
 			return res.status(resp.statusCode).send(resp);
@@ -126,7 +180,8 @@ module.exports.chat = function (req, res, next) {
 					title: 'Chat',
 					user: req.user,
 					chatEndpoint: config.chat.endpoint,
-					chatToken: bodyObj.token
+					chatToken: bodyObj.token,
+					roomId: roomId
 				});
 			}
 		}

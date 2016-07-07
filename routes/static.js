@@ -32,6 +32,10 @@ router.route('/chat')
 	// GET - render chat page
 	.get(auth.isAuthenticated, render.chat);
 
+router.route('/chat/:roomId')
+	// GET - render chat room page
+	.get(render.chatRoom);
+
 router.route('/local_test')
 	// GET - render local user info
 	.get(render.localTest);
